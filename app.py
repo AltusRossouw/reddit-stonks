@@ -218,4 +218,9 @@ async def index():
     return HTMLResponse(open("static/index.html").read())
 
 
+@app.get("/app")
+async def app_page():
+    return HTMLResponse(open("static/app.html").read())
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")

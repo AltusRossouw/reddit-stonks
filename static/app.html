@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyzer — Reddit Stonks</title>
+<script defer src="https://umami.intellixlabs.co.za/script.js" data-website-id="4d60d5ac-9056-4e62-afb8-2fa2dc7c0134"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50: '#eefbf2', 100: '#d6f5dd', 200: '#b0eabf', 300: '#7cd997', 400: '#4ac06e', 500: '#26a54b', 600: '#18863a', 700: '#146a30', 800: '#135429', 900: '#114523', 950: '#052610' }
+      },
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+.glass { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+.gradient-text { background: linear-gradient(135deg, #4ac06e 0%, #7cd997 50%, #4ac06e 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; }
+@keyframes gradientShift { 0%, 100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-fade-up { animation: fadeUp 0.7s ease-out both; }
+.delay-100 { animation-delay: 0.1s; }
+.float { animation: float 4s ease-in-out infinite; }
+.spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #4ac06e; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; display: inline-block; }
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; }
+.grid-bg { background-image: radial-gradient(rgba(74, 192, 110, 0.06) 1px, transparent 1px); background-size: 40px 40px; }
+</style>
+</head>
+<body class="bg-[#070b12] text-gray-200 min-h-screen">
+
+<!-- Background -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+  <div class="orb w-[500px] h-[500px] bg-brand-500 -top-20 -right-20" style="opacity:0.12"></div>
+  <div class="orb w-[300px] h-[300px] bg-brand-300 bottom-0 -left-10" style="opacity:0.06"></div>
+  <div class="grid-bg absolute inset-0"></div>
+</div>
+
+<!-- Nav -->
+<header class="glass sticky top-0 z-50 px-6 py-3.5">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5 group">
+      <span class="text-2xl float" style="animation-duration:5s">📈</span>
+      <span class="text-xl font-extrabold gradient-text">Reddit Stonks</span>
+    </a>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a>
+      <a href="https://github.com/AltusRossouw/reddit-stonks" class="text-gray-400 hover:text-brand-400 transition-colors flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ANALYZER CONTROLS -->
+<section class="relative z-10 max-w-6xl mx-auto px-6 pt-12 pb-6">
+  <div class="animate-fade-up">
+    <h1 class="text-4xl sm:text-5xl font-black text-white text-center mb-2">Stock Analyzer</h1>
+    <p class="text-gray-400 text-center mb-8">Scrapes Reddit, pulls live market data, and gets an AI pick. ~30 seconds.</p>
+  </div>
+
+  <div class="glass rounded-2xl p-6 lg:p-8 animate-fade-up delay-100">
+    <div class="flex flex-wrap items-end gap-6">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-400 mb-2">Posts per subreddit</label>
+        <input id="posts" type="range" min="5" max="100" value="25" class="w-full accent-brand-500 h-2 rounded-lg cursor-pointer">
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+          <span>5 (fast)</span><span>25</span><span>100 (deep)</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 pb-1">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input id="euro" type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-brand-500 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+        </label>
+        <span class="text-sm text-gray-400">European tickers</span>
+      </div>
+      <button id="analyze-btn" onclick="runAnalysis()"
+        class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-3.5 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-brand-500/20 whitespace-nowrap">
+        Analyze
+      </button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div id="status" class="hidden glass rounded-2xl p-6 text-center mt-6 animate-fade-up">
+    <div class="flex items-center justify-center gap-3">
+      <div class="spinner"></div>
+      <span id="status-text" class="text-brand-400 font-medium text-lg">Scraping Reddit...</span>
+    </div>
+    <div class="mt-4 h-1 bg-gray-800 rounded-full overflow-hidden max-w-md mx-auto">
+      <div class="h-full bg-gradient-to-r from-brand-500 to-brand-300 rounded-full animate-pulse" style="width: 60%"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="relative z-10 max-w-6xl mx-auto px-6 pb-8 space-y-8">
+
+  <div id="stock-section" class="hidden">
+    <h2 class="text-xl font-bold text-white mb-4">Stock Data Snapshot</h2>
+    <div class="glass rounded-2xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="border-b border-gray-800">
+          <tr class="text-gray-400 text-left">
+            <th class="p-3 pl-4">Ticker</th>
+            <th class="p-3 text-right">Price</th>
+            <th class="p-3 text-right">1Wk Chg</th>
+            <th class="p-3 text-right hidden sm:table-cell">Mkt Cap</th>
+            <th class="p-3 text-right hidden md:table-cell">P/E</th>
+            <th class="p-3 text-right hidden md:table-cell">Beta</th>
+            <th class="p-3 text-right">Mentions</th>
+            <th class="p-3 text-center hidden sm:table-cell">Rec</th>
+          </tr>
+        </thead>
+        <tbody id="stock-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="analysis-section" class="hidden">
+    <h2 class="text-xl font-bold text-white mb-4">AI Analysis — Best Stock for Next 7 Days</h2>
+    <div id="analysis-content" class="glass rounded-2xl p-6 lg:p-8"></div>
+  </div>
+
+  <div id="euro-section" class="hidden">
+    <h2 class="text-xl font-bold text-white mb-4">European Equivalents</h2>
+    <div class="glass rounded-2xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="border-b border-gray-800">
+          <tr class="text-gray-400 text-left">
+            <th class="p-3 pl-4">US Ticker</th>
+            <th class="p-3">Euro Ticker</th>
+            <th class="p-3">Exchange</th>
+            <th class="p-3 text-right">Price</th>
+            <th class="p-3">Currency</th>
+          </tr>
+        </thead>
+        <tbody id="euro-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="disclaimer" class="hidden text-center text-xs text-gray-600 pb-8">
+    DISCLAIMER: AI-generated analysis for entertainment/educational purposes only. Not financial advice. Past performance does not guarantee future results. Always do your own research.
+  </div>
+
+</section>
+
+<script>
+function formatMCap(cap) { if (!cap) return 'N/A'; return '$' + (cap / 1e9).toFixed(1) + 'B'; }
+function formatChange(pct) { const cls = pct >= 0 ? 'text-green-400' : 'text-red-400'; const sign = pct >= 0 ? '+' : ''; return `<span class="${cls} font-semibold">${sign}${pct.toFixed(2)}%</span>`; }
+function formatPrice(p) { return '$' + p.toFixed(2); }
+
+function renderAnalysis(text) {
+  return text
+    .replace(/\*\*(TOP PICK[^*]*)\*\*/g, '<div class="mt-6 mb-2 text-xl font-black text-green-400">$1</div>')
+    .replace(/\*\*(RUNNER-UP[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-blue-400">$1</div>')
+    .replace(/\*\*(WILDCARD[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-orange-400">$1</div>')
+    .replace(/\*\*(Risk[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-red-400">$1</div>')
+    .replace(/\*\*(Confidence[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-yellow-400">$1</div>')
+    .replace(/\*\*(European[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-purple-400">$1</div>')
+    .replace(/- Rationale:\s*(.*?)(?=<br>|$)/g, '<div class="text-gray-400 ml-4 mt-1 leading-relaxed">$1</div>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    .replace(/\n- (.*?)(?=\n|$)/g, '<div class="flex items-start gap-2 ml-4 mt-1 text-gray-400"><span class="text-brand-400 mt-1.5">&#8226;</span> <span>$1</span></div>')
+    .replace(/\n\n/g, '<br>')
+    .replace(/\n/g, '<br>');
+}
+
+function recBadge(rec) {
+  const map = {
+    strong_buy: 'bg-green-900/50 text-green-400 border-green-500/20',
+    buy: 'bg-green-900/30 text-green-300 border-green-500/10',
+    hold: 'bg-yellow-900/30 text-yellow-300 border-yellow-500/10',
+    sell: 'bg-red-900/30 text-red-300 border-red-500/10',
+    strong_sell: 'bg-red-900/50 text-red-400 border-red-500/20',
+  };
+  const cls = map[rec] || 'bg-gray-800 text-gray-400 border-gray-600/20';
+  return `<span class="px-2 py-0.5 rounded-full text-xs border ${cls}">${rec.replace(/_/g,' ')}</span>`;
+}
+
+async function runAnalysis() {
+  const btn = document.getElementById('analyze-btn');
+  const posts = document.getElementById('posts').value;
+  const euro = document.getElementById('euro').checked;
+
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+
+  ['stock-section','analysis-section','euro-section','disclaimer'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('status').classList.remove('hidden');
+
+  try {
+    const es = new EventSource(`/api/analyze?posts=${posts}&euro=${euro}`);
+
+    es.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+
+      if (data.type === 'status') {
+        document.getElementById('status-text').textContent = data.message;
+      }
+
+      if (data.type === 'result') {
+        if (data.stocks) {
+          document.getElementById('stock-body').innerHTML = data.stocks.map(s => `
+            <tr class="border-b border-gray-800/30 hover:bg-white/[0.03] transition-colors">
+              <td class="p-3 pl-4 font-bold text-brand-400">$${s.ticker}</td>
+              <td class="p-3 text-right font-mono">${formatPrice(s.price)}</td>
+              <td class="p-3 text-right font-mono">${formatChange(s.week_change_pct)}</td>
+              <td class="p-3 text-right font-mono hidden sm:table-cell text-gray-400">${formatMCap(s.market_cap)}</td>
+              <td class="p-3 text-right font-mono hidden md:table-cell text-gray-400">${s.pe_ratio ? s.pe_ratio.toFixed(1) : '\u2014'}</td>
+              <td class="p-3 text-right font-mono hidden md:table-cell text-gray-400">${s.beta ? s.beta.toFixed(2) : '\u2014'}</td>
+              <td class="p-3 text-right font-mono font-semibold text-white">${s.mentions}</td>
+              <td class="p-3 text-center hidden sm:table-cell">${recBadge(s.recommendation)}</td>
+            </tr>
+          `).join('');
+          document.getElementById('stock-section').classList.remove('hidden');
+        }
+
+        if (data.analysis) {
+          document.getElementById('analysis-content').innerHTML = renderAnalysis(data.analysis);
+          document.getElementById('analysis-section').classList.remove('hidden');
+        }
+
+        if (data.euro && data.euro.length > 0) {
+          let rows = '';
+          data.euro.forEach(e => {
+            if (e.equivalents.length === 0) {
+              rows += `<tr class="border-b border-gray-800/30"><td class="p-3 pl-4 font-bold text-brand-400">$${e.us_ticker}</td><td class="p-3 text-gray-600">\u2014</td><td class="p-3 text-gray-600">\u2014</td><td class="p-3 text-right text-gray-600">\u2014</td><td class="p-3 text-gray-600">\u2014</td></tr>`;
+            } else {
+              e.equivalents.forEach(eq => {
+                rows += `<tr class="border-b border-gray-800/30 hover:bg-white/[0.03] transition-colors">
+                  <td class="p-3 pl-4 font-bold text-brand-400">$${e.us_ticker}</td>
+                  <td class="p-3 font-mono text-green-400 font-semibold">${eq.ticker}</td>
+                  <td class="p-3 text-gray-400">${eq.exchange}</td>
+                  <td class="p-3 text-right font-mono">${eq.price.toFixed(2)}</td>
+                  <td class="p-3 text-gray-400">${eq.currency}</td>
+                </tr>`;
+              });
+            }
+          });
+          document.getElementById('euro-body').innerHTML = rows;
+          document.getElementById('euro-section').classList.remove('hidden');
+        }
+      }
+
+      if (data.type === 'done') {
+        es.close();
+        document.getElementById('status').classList.add('hidden');
+        document.getElementById('disclaimer').classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Analyze';
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+      document.getElementById('status').classList.add('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Analyze';
+    };
+  } catch (err) {
+    document.getElementById('status').classList.add('hidden');
+    btn.disabled = false;
+    btn.textContent = 'Analyze';
+  }
+}
+
+document.getElementById('posts').addEventListener('input', function() {
+  const labels = this.parentElement.querySelectorAll('span');
+  if (labels.length >= 3) labels[1].textContent = this.value;
+});
+</script>
+
+</body>
+</html>
