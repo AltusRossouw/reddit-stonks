@@ -2,7 +2,7 @@
 
 Scrape Reddit stock pages + AI-powered analysis to find the best stock for a 1-week return.
 
-**Live:** [stonks.altusrossouw.co.za](http://stonks.altusrossouw.co.za) | **192.168.10.170:80**
+**Live:** [stonks.altusrossouw.co.za](http://stonks.altusrossouw.co.za)
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-reddit--stonks-green)](https://clawhub.ai/skills/reddit-stonks)
 
