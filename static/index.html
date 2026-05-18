@@ -72,10 +72,19 @@ tailwind.config = {
   <div class="ticker-tape">
     <div class="ticker-tape-inner text-xs text-gray-500 font-mono tracking-wide">
       <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span>
+
+(Showing lines 70-74 of 189. Use offset=75 to continue.)
       <span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$SNDK</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
       <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span>
       <span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$SNDK</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
     </div>
+  </div>
+</div>
+
+<!-- Disclaimer Banner -->
+<div class="relative z-10 bg-red-500/10 border-b border-red-500/20">
+  <div class="max-w-6xl mx-auto px-6 py-2.5 text-center text-xs text-red-400/80 font-medium">
+    DISCLAIMER: This is an AI-powered experiment for entertainment purposes only. NOT financial advice. Do not make investment decisions based on these results.
   </div>
 </div>
 
@@ -90,9 +99,10 @@ tailwind.config = {
       Reddit says <span class="gradient-text">buy</span>.<br class="sm:hidden"> So should you?
     </h1>
     <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-      Scrapes r/wallstreetbets, r/stocks, and 5 more subreddits.
-      Extracts every stock ticker. Pulls real-time market data.
-      Then a <strong class="text-white">Deepseek AI quant</strong> picks the single best stock for the next 7 days.
+      A <strong class="text-white">for-fun experiment</strong> that scrapes r/wallstreetbets, r/stocks, and 5 more subreddits.
+      Extracts stock tickers. Pulls real-time market data.
+      Then <strong class="text-white">Deepseek AI</strong> generates a purely hypothetical pick.
+      <span class="text-red-400 font-semibold">Not financial advice. Never invest based on AI output.</span>
     </p>
     <a href="/app" class="inline-block bg-brand-500 hover:bg-brand-600 text-white font-bold px-12 py-5 rounded-2xl text-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-brand-500/25">
       Open Analyzer
@@ -163,10 +173,13 @@ tailwind.config = {
 <section class="relative z-10 max-w-3xl mx-auto px-6 pb-24 text-center">
   <div class="glass rounded-3xl p-10 sm:p-14 animate-fade-up">
     <h2 class="text-2xl sm:text-3xl font-black text-white mb-4">Ready to see what Reddit's thinking?</h2>
-    <p class="text-gray-400 mb-8 max-w-md mx-auto">Run a scan now. It takes about 30 seconds to scrape, crunch the numbers, and deliver an AI-powered pick.</p>
-    <a href="/app" class="inline-block bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-brand-500/20">
+    <p class="text-gray-400 mb-6 max-w-md mx-auto">Run a scan now. It takes about 30 seconds to scrape, crunch the numbers, and deliver an <strong>AI-generated prediction</strong>.</p>
+    <a href="/app" class="inline-block bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-brand-500/20 mb-6">
       Launch Analyzer
     </a>
+    <p class="text-xs text-red-400/70 max-w-sm mx-auto leading-relaxed">
+      Results are AI-generated entertainment. This is not investment advice, a recommendation, or a solicitation to trade. You could lose all your money following random internet predictions.
+    </p>
   </div>
 </section>
 
@@ -176,7 +189,7 @@ tailwind.config = {
     <div class="flex items-center gap-1.5">
       <span>Built with</span>
       <span class="text-red-400">&#9829;</span>
-      <span>+ Python + Deepseek</span>
+      <span>+ Python + Deepseek · For entertainment only</span>
     </div>
     <div class="flex items-center gap-6">
       <a href="https://github.com/AltusRossouw/reddit-stonks" class="hover:text-gray-400 transition-colors">GitHub</a>

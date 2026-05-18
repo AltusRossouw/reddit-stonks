@@ -133,7 +133,7 @@ DATA:
         response = await loop.run_in_executor(
             None,
             lambda: client.chat.completions.create(
-                model="deepseek-chat",
+                model="deepseek-v4-flash",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},

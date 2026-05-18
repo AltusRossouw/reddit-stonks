@@ -1,0 +1,28 @@
+Title: I built an AI that scrapes WSB to tell me what stock to buy. It picked $MU. YOLO or no?
+
+Body:
+
+So I got tired of scrolling through 47 "DD" posts written by people who can't spell "catalyst" and built this abomination.
+
+**What it does:**
+- Scrapes r/wallstreetbets, r/stocks, r/pennystocks, etc.
+- Finds every $TICKER mentioned
+- Pulls real market data (P/E, short float, volume, analyst targets)
+- Feeds it all to Deepseek AI and asks: *"which one prints in 7 days?"*
+
+**How to use it:**
+CLI: `pip install -r requirements.txt && python3 stonks.py`
+Web: [stonks.altusrossouw.co.za](http://stonks.altusrossouw.co.za)
+GitHub: https://github.com/AltusRossouw/reddit-stonks
+
+**What it told me today:**
+Top pick was $MU (Micron). Forward P/E of 7, strong buy consensus, oversold by 9% in a week. It also gave me a runner-up ($NVDA) and a wildcard degen play ($POET — up 15% with 9.6% short float).
+
+**Before you come for me:**
+This is 100% for entertainment. I am not a financial advisor. The AI is not a financial advisor. No one on this sub is a financial advisor. If you take a second mortgage because a Python script told you to, that's between you and God.
+
+That said, the code is free. Steal it. Break it. Make it better. Or don't. I'm not your dad.
+
+Positions: $0.00 (I'm too regarded to follow my own AI's advice)
+
+🦧🚀📉💀
