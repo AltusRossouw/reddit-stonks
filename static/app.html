@@ -132,6 +132,7 @@ tailwind.config = {
             <th class="p-2 text-right hidden md:table-cell">P/E</th>
             <th class="p-2 text-right hidden md:table-cell">Beta</th>
             <th class="p-2 text-right">Mentions</th>
+            <th class="p-2 text-center">Trend</th>
             <th class="p-2 text-center hidden sm:table-cell">Rec</th>
           </tr>
         </thead>
@@ -204,6 +205,12 @@ function recBadge(rec) {
   return `<span class="px-1.5 py-0.5 rounded text-[10px] border ${cls}">${rec.replace(/_/g,' ')}</span>`;
 }
 
+function trendIcon(trend) {
+  const map = { rising: '↑', falling: '↓', new: '★', steady: '→', gone: '✗' };
+  const colors = { rising: 'text-neon-green', falling: 'text-neon-red', new: 'text-neon-yellow', steady: 'text-gray-600', gone: 'text-gray-700' };
+  return `<span class="${colors[trend] || 'text-gray-600'} font-bold">${map[trend] || '→'}</span>`;
+}
+
 async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
   const euro = document.getElementById('euro').checked;
@@ -228,6 +235,7 @@ async function runAnalysis() {
               <td class="p-2 text-right hidden md:table-cell text-gray-600">${s.pe_ratio ? s.pe_ratio.toFixed(1) : '--'}</td>
               <td class="p-2 text-right hidden md:table-cell text-gray-600">${s.beta ? s.beta.toFixed(2) : '--'}</td>
               <td class="p-2 text-right text-neon-yellow font-bold">${s.mentions}</td>
+              <td class="p-2 text-center">${trendIcon(s.trend)}</td>
               <td class="p-2 text-center hidden sm:table-cell">${recBadge(s.recommendation)}</td>
             </tr>`).join('');
           document.getElementById('stock-section').classList.remove('hidden');

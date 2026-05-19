@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Optional
 
 import yfinance as yf
 
@@ -71,60 +73,61 @@ def find_european_equivalents(us_ticker: str) -> list[dict]:
     return results
 
 
+def _fetch_one(ticker: str) -> tuple:
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        history = stock.history(period="1mo")
+        if history.empty or not info:
+            return ticker, None
+
+        latest = history.iloc[-1]
+        week_ago = history.iloc[-5] if len(history) >= 5 else history.iloc[0]
+        price = float(latest["Close"])
+        week_change_pct = round((price - float(week_ago["Close"])) / float(week_ago["Close"]) * 100, 2)
+        volume = int(latest.get("Volume", 0))
+        avg_volume = int(history["Volume"].tail(20).mean()) if "Volume" in history else 0
+        month_high = float(history["High"].max())
+        month_low = float(history["Low"].min())
+
+        return ticker, {
+            "price": price,
+            "currency": info.get("currency", "USD"),
+            "market_cap": info.get("marketCap"),
+            "sector": info.get("sector", "N/A"),
+            "industry": info.get("industry", "N/A"),
+            "short_name": info.get("shortName", ticker),
+            "week_change_pct": week_change_pct,
+            "volume": volume,
+            "avg_volume_20d": avg_volume,
+            "volume_ratio": round(volume / avg_volume, 2) if avg_volume else 0,
+            "month_high": month_high,
+            "month_low": month_low,
+            "high_from_low_pct": round((price - month_low) / month_low * 100, 2) if month_low else 0,
+            "pe_ratio": info.get("trailingPE"),
+            "forward_pe": info.get("forwardPE"),
+            "beta": info.get("beta"),
+            "fifty_day_avg": info.get("fiftyDayAverage"),
+            "two_hundred_day_avg": info.get("twoHundredDayAverage"),
+            "recommendation": info.get("recommendationKey", "N/A"),
+            "target_mean": info.get("targetMeanPrice"),
+            "short_pct": info.get("shortPercentOfFloat"),
+        }
+    except Exception:
+        return ticker, None
+
+
 def fetch_stock_data(tickers: list[str]) -> dict[str, dict]:
     results: dict[str, dict] = {}
-
     print(f"\nFetching stock data for {len(tickers)} tickers...\n")
 
-    for ticker in tickers:
-        try:
-            stock = yf.Ticker(ticker)
-            info = stock.info
-            history = stock.history(period="1mo")
-
-            if history.empty or not info:
-                continue
-
-            latest = history.iloc[-1]
-            week_ago = history.iloc[-5] if len(history) >= 5 else history.iloc[0]
-
-            price = float(latest["Close"])
-            week_change_pct = round((price - float(week_ago["Close"])) / float(week_ago["Close"]) * 100, 2)
-
-            volume = int(latest.get("Volume", 0))
-            avg_volume = int(history["Volume"].tail(20).mean()) if "Volume" in history else 0
-
-            month_high = float(history["High"].max())
-            month_low = float(history["Low"].min())
-
-            results[ticker] = {
-                "price": price,
-                "currency": info.get("currency", "USD"),
-                "market_cap": info.get("marketCap"),
-                "sector": info.get("sector", "N/A"),
-                "industry": info.get("industry", "N/A"),
-                "short_name": info.get("shortName", ticker),
-                "week_change_pct": week_change_pct,
-                "volume": volume,
-                "avg_volume_20d": avg_volume,
-                "volume_ratio": round(volume / avg_volume, 2) if avg_volume else 0,
-                "month_high": month_high,
-                "month_low": month_low,
-                "high_from_low_pct": round((price - month_low) / month_low * 100, 2) if month_low else 0,
-                "pe_ratio": info.get("trailingPE"),
-                "forward_pe": info.get("forwardPE"),
-                "beta": info.get("beta"),
-                "fifty_day_avg": info.get("fiftyDayAverage"),
-                "two_hundred_day_avg": info.get("twoHundredDayAverage"),
-                "recommendation": info.get("recommendationKey", "N/A"),
-                "target_mean": info.get("targetMeanPrice"),
-                "short_pct": info.get("shortPercentOfFloat"),
-            }
-
-            print(f"  ${ticker}: ${price:.2f} ({week_change_pct:+.2f}% wk) - {results[ticker]['short_name']}")
-
-        except Exception as e:
-            print(f"  ${ticker}: error - {e}")
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = {executor.submit(_fetch_one, t): t for t in tickers}
+        for future in as_completed(futures):
+            ticker, data = future.result()
+            if data:
+                results[ticker] = data
+                print(f"  ${ticker}: ${data['price']:.2f} ({data['week_change_pct']:+.2f}% wk) - {data['short_name']}")
 
     print(f"\nFetched data for {len(results)} tickers.")
     return results

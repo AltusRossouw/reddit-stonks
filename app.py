@@ -51,12 +51,13 @@ def parse_top_ticker_price(ticker: str, stock_data: dict) -> float:
 def build_context(reddit_data: dict, stock_data: dict, euro: bool = False) -> str:
     ticker_counts = reddit_data["ticker_counts"]
     top_tickers = list(ticker_counts.keys())[:TOP_N_TICKERS]
+    trends = reddit_data.get("trends", {})
 
     lines = [
         f"Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}",
         f"Total Reddit Posts Analyzed: {len(reddit_data['posts'])}",
         "",
-        "=== STOCK DATA ===",
+        "=== STOCK DATA (with MOMENTUM TREND) ===",
     ]
 
     for ticker in top_tickers:
@@ -64,6 +65,7 @@ def build_context(reddit_data: dict, stock_data: dict, euro: bool = False) -> st
         if not sd:
             continue
         mentions = ticker_counts.get(ticker, 0)
+        trend = trends.get(ticker, "steady")
         cap_str = f"${sd['market_cap']/1e9:.1f}B" if sd["market_cap"] else "N/A"
         target_str = f"${sd['target_mean']:.2f}" if sd.get("target_mean") else "N/A"
         short_str = f"{sd['short_pct']*100:.1f}%" if sd.get("short_pct") else "N/A"
@@ -83,13 +85,22 @@ def build_context(reddit_data: dict, stock_data: dict, euro: bool = False) -> st
             f"AnalystTarget={target_str}, "
             f"ShortFloat={short_str}, "
             f"VolRatio={sd['volume_ratio']}, "
-            f"RedditMentions={mentions}"
+            f"RedditMentions={mentions}, "
+            f"MentionsTrend={trend} (rising=accelerating hype, falling=fading interest, new=first appearance, steady=same level)"
         )
+
+    trending_up = [t for t in top_tickers if trends.get(t) == "rising"]
+    trending_down = [t for t in top_tickers if trends.get(t) == "falling"]
+    if trending_up:
+        lines.append(f"\nRISING mentions (more hype this week vs last): {', '.join('$'+t for t in trending_up)}")
+    if trending_down:
+        lines.append(f"FALLING mentions (less hype this week vs last): {', '.join('$'+t for t in trending_down)}")
 
     lines.append("")
     lines.append("=== REDDIT MENTION RANKING ===")
     for ticker, count in list(ticker_counts.items())[:TOP_N_TICKERS]:
-        lines.append(f"  ${ticker}: {count} mentions")
+        trend_icon = {"rising": "↑", "falling": "↓", "new": "★", "steady": "→", "gone": "✗"}.get(trends.get(ticker, ""), "")
+        lines.append(f"  ${ticker}: {count} mentions {trend_icon}")
 
     if euro:
         lines.append("")
@@ -105,7 +116,11 @@ async def run_analysis(context: str) -> str:
         "Your specialty is combining social media sentiment analysis with "
         "fundamental and technical data to identify short-term trading opportunities. "
         "Output your analysis in clear sections with specific reasoning. "
-        "Be concise and data-driven."
+        "Be concise and data-driven.\n\n"
+        "CRITICAL: A stock with RISING mentions + strong fundamentals is a buy signal. "
+        "A stock with FALLING mentions (fading hype) is a sell signal — do NOT pick these. "
+        "A stock with RISING mentions but weak fundamentals is a hype trap — be skeptical. "
+        "Weight fundamentals (P/E, beta, analyst consensus) at least as heavily as Reddit sentiment."
     )
 
     user_prompt = f"""Analyze the following data and determine which single stock has the highest probability of delivering the best return over the NEXT 7 DAYS (1 week).
@@ -193,6 +208,7 @@ async def event_stream(posts_per_sub: int, euro: bool):
             "recommendation": sd["recommendation"],
             "target_mean": sd.get("target_mean"),
             "mentions": reddit_data["ticker_counts"].get(ticker, 0),
+            "trend": reddit_data.get("trends", {}).get(ticker, "steady"),
         })
 
     context = build_context(reddit_data, stock_data, euro=euro)
