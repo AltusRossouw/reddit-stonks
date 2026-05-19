@@ -1,0 +1,64 @@
+{
+  "picks": [
+    {
+      "id": "b447a847",
+      "date": "2026-05-19",
+      "timestamp": 1778581784.231987,
+      "top_pick": "SEGG",
+      "top_pick_price": 2.4000000953674316,
+      "runner_up": "MSFT",
+      "runner_up_price": 423.5400085449219,
+      "wildcard": "",
+      "wildcard_price": 0,
+      "confidence": 0,
+      "posts_scraped": 35,
+      "tickers_found": 30,
+      "analysis": "**TOP PICK: $SEGG**\n- Rationale: SEGG combines the strongest short squeeze potential (19.1% short float) with a massive analyst target ($15.50 vs $2.40) and recent price momentum (+75% weekly). Low price and high beta (2.2) attract retail speculators, and although Reddit mentions are modest (2), the sheer asymmetry of the setup favors continued volatility-driven upside over the next 7 days.\n\n**RUNNER-UP: $MSFT**\n- Rationale: MSFT offers a low-risk, high-conviction play with strong buy consensus,"
+    },
+    {
+      "id": "4da80198",
+      "date": "2026-05-19",
+      "timestamp": 1779186558.416416,
+      "top_pick": "SEGG",
+      "top_pick_price": 2.4000000953674316,
+      "runner_up": "MT",
+      "runner_up_price": 61.869998931884766,
+      "wildcard": "RSI",
+      "wildcard_price": 27.670000076293945,
+      "confidence": 0,
+      "posts_scraped": 35,
+      "tickers_found": 30,
+      "analysis": "**TOP PICK: $SEGG**  \n- **Rationale:** $SEGG combines the highest Reddit mentions (2), a massive 75% weekly surge, and a 19.1% short float (strong squeeze potential). The analyst target of $15.50 implies 545% upside from $2.40, and despite risk of overextension, the convergence of retail hype, high short interest, and tiny market cap make it the most likely candidate for a continued squeeze-driven move over the next week.\n\n**RUNNER-UP: $MT**  \n- **Rationale:** $MT offers a cheap forward P/E of 8"
+    },
+    {
+      "id": "af51a58a",
+      "date": "2026-05-12",
+      "timestamp": 1778581831.5443861,
+      "top_pick": "NVDA",
+      "top_pick_price": 218.5,
+      "runner_up": "AMD",
+      "runner_up_price": 435.2,
+      "wildcard": "POET",
+      "wildcard_price": 14.22,
+      "confidence": 7,
+      "posts_scraped": 350,
+      "tickers_found": 498,
+      "analysis": "TOP PICK:  with strong momentum"
+    },
+    {
+      "id": "e2d26681",
+      "date": "2026-05-05",
+      "timestamp": 1777977031.544611,
+      "top_pick": "MU",
+      "top_pick_price": 765.34,
+      "runner_up": "MSFT",
+      "runner_up_price": 410.0,
+      "wildcard": "NBIS",
+      "wildcard_price": 190.5,
+      "confidence": 6,
+      "posts_scraped": 350,
+      "tickers_found": 498,
+      "analysis": "TOP PICK:  deep value play"
+    }
+  ]
+}

@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reddit Stonks — AI-Powered Stock Picks From Reddit</title>
-<script defer src="https://umami.intellixlabs.co.za/script.js" data-website-id="4d60d5ac-9056-4e62-afb8-2fa2dc7c0134"></script>
+<title>Reddit Stonks — AI Stock Picker (Not Financial Advice)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -12,188 +11,201 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        brand: { 50: '#eefbf2', 100: '#d6f5dd', 200: '#b0eabf', 300: '#7cd997', 400: '#4ac06e', 500: '#26a54b', 600: '#18863a', 700: '#146a30', 800: '#135429', 900: '#114523', 950: '#052610' }
+        neon: { green: '#39ff14', pink: '#ff2d95', cyan: '#00f0ff', yellow: '#ffe600', red: '#ff3333' },
+        bg: { dark: '#0a0a0a', card: '#111111' }
       },
-      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+      fontFamily: { mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'], sans: ['Inter', 'system-ui', 'sans-serif'] }
     }
   }
 }
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-.glass { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-.glass-card { background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
-.gradient-text { background: linear-gradient(135deg, #4ac06e 0%, #7cd997 50%, #4ac06e 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; }
-@keyframes gradientShift { 0%, 100% { background-position: 0% center; } 50% { background-position: 100% center; } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.animate-fade-up { animation: fadeUp 0.7s ease-out both; }
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
-.float { animation: float 4s ease-in-out infinite; }
-.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; }
-.grid-bg { background-image: radial-gradient(rgba(74, 192, 110, 0.06) 1px, transparent 1px); background-size: 40px 40px; }
-.ticker-tape { overflow: hidden; white-space: nowrap; }
-.ticker-tape-inner { display: inline-flex; animation: ticker 60s linear infinite; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes glow { 0%, 100% { text-shadow: 0 0 8px #39ff14, 0 0 24px #39ff1444; } 50% { text-shadow: 0 0 16px #39ff14, 0 0 48px #39ff1466; } }
+  @keyframes glitch { 0%, 100% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } }
+  @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .glow { animation: glow 2s ease-in-out infinite; }
+  .glitch:hover { animation: glitch 0.3s ease-in-out; }
+  .scanline { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: #39ff1410; z-index: 9999; pointer-events: none; animation: scanline 8s linear infinite; }
+  .cursor-blink { animation: blink 1s step-end infinite; }
+  .animate-fade-up { animation: fadeUp 0.7s ease-out both; }
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .float { animation: float 3s ease-in-out infinite; }
+  .ticker-tape { overflow: hidden; white-space: nowrap; }
+  .ticker-tape-inner { display: inline-flex; animation: ticker 50s linear infinite; }
+  .terminal { background: #0d0d0d; border: 1px solid #333; border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+  .terminal-bar { background: #1a1a1a; border-bottom: 1px solid #333; padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f57; }
+  .terminal-dot.yellow { background: #febc2e; }
+  .terminal-dot.green { background: #28c840; }
+  .noise { position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
 </style>
 </head>
-<body class="bg-[#070b12] text-gray-200 min-h-screen">
+<body class="bg-[#0a0a0a] text-gray-300 min-h-screen font-sans">
 
-<!-- Background -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-  <div class="orb w-[600px] h-[600px] bg-brand-500 -top-40 -right-40"></div>
-  <div class="orb w-[400px] h-[400px] bg-brand-300 bottom-0 -left-20" style="opacity:0.08"></div>
-  <div class="grid-bg absolute inset-0"></div>
-</div>
+<div class="scanline"></div>
+<div class="noise"></div>
 
 <!-- Nav -->
-<header class="glass sticky top-0 z-50 px-6 py-3.5">
-  <div class="max-w-6xl mx-auto flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 group">
-      <span class="text-2xl float" style="animation-duration:5s">📈</span>
-      <span class="text-xl font-extrabold gradient-text">Reddit Stonks</span>
+<header class="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-gray-800/50 px-6 py-3">
+  <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-xl font-mono font-bold text-neon-green glow">📈 $STONKS</span>
     </a>
-    <nav class="flex items-center gap-6 text-sm text-gray-400">
-      <a href="/app" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-5 py-2 rounded-xl transition-all hover:scale-105">Open Analyzer</a>
-      <a href="https://github.com/AltusRossouw/reddit-stonks" class="hover:text-brand-400 transition-colors flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        GitHub
-      </a>
+    <nav class="flex items-center gap-5 text-sm font-mono">
+      <a href="/app" class="text-gray-500 hover:text-neon-green transition-colors">Analyzer</a>
+      <a href="/track-record" class="text-gray-500 hover:text-neon-green transition-colors">Track Record</a>
+      <a href="https://github.com/AltusRossouw/reddit-stonks" class="text-gray-500 hover:text-neon-cyan transition-colors">GitHub</a>
     </nav>
   </div>
 </header>
 
 <!-- Ticker tape -->
-<div class="relative z-10 border-y border-white/5 bg-white/[0.02] py-2 overflow-hidden">
+<div class="border-b border-gray-800/30 bg-[#0d0d0d] py-1.5 overflow-hidden">
   <div class="ticker-tape">
-    <div class="ticker-tape-inner text-xs text-gray-500 font-mono tracking-wide">
-      <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span>
-
-(Showing lines 70-74 of 189. Use offset=75 to continue.)
-      <span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$SNDK</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
-      <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span>
-      <span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$SNDK</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
+    <div class="ticker-tape-inner font-mono text-xs text-gray-600">
+      <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span><span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
+      <span class="mx-8">$NVDA</span><span class="mx-8">$AMD</span><span class="mx-8">$MU</span><span class="mx-8">$TSLA</span><span class="mx-8">$AAPL</span><span class="mx-8">$MSFT</span><span class="mx-8">$GOOGL</span><span class="mx-8">$META</span><span class="mx-8">$AMZN</span><span class="mx-8">$RKLB</span><span class="mx-8">$ASTS</span><span class="mx-8">$SPY</span><span class="mx-8">$QQQ</span><span class="mx-8">$CRWD</span><span class="mx-8">$PLTR</span><span class="mx-8">$POET</span><span class="mx-8">$NBIS</span><span class="mx-8">$INTC</span>
     </div>
   </div>
 </div>
 
 <!-- Disclaimer Banner -->
-<div class="relative z-10 bg-red-500/10 border-b border-red-500/20">
-  <div class="max-w-6xl mx-auto px-6 py-2.5 text-center text-xs text-red-400/80 font-medium">
-    DISCLAIMER: This is an AI-powered experiment for entertainment purposes only. NOT financial advice. Do not make investment decisions based on these results.
+<div class="bg-neon-red/10 border-b border-neon-red/20">
+  <div class="max-w-5xl mx-auto px-6 py-2 text-center text-xs text-neon-red/80 font-mono font-bold">
+    ⚠️ NOT FINANCIAL ADVICE — AI-powered meme experiment. Do not invest based on this. You will lose money.
   </div>
 </div>
 
 <!-- HERO -->
-<section class="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-12 text-center">
+<section class="relative z-10 max-w-5xl mx-auto px-6 pt-16 pb-12 text-center">
   <div class="animate-fade-up">
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 glass rounded-full text-xs text-brand-300 mb-6">
-      <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span></span>
-      Powered by Deepseek AI + Yahoo Finance
+    <div class="inline-block mb-6">
+      <div class="terminal text-left max-w-lg mx-auto">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <span class="text-xs text-gray-600 ml-2">stonks_analyzer.py</span>
+        </div>
+        <div class="p-4 text-sm leading-relaxed">
+          <span class="text-gray-500">$</span> <span class="text-neon-green">python3</span> stonks.py<br>
+          <span class="text-gray-600">Scraping 7 subreddits...</span><br>
+          <span class="text-gray-600">Found 498 tickers. Fetching data...</span><br>
+          <span class="text-gray-600">Sending to Deepseek AI...</span><br>
+          <span class="text-neon-cyan">→ $MU: Forward P/E 7. Oversold 9%.</span><br>
+          <span class="text-neon-yellow">→ Confidence: 6/10. Good luck.</span><br>
+          <span class="text-neon-green cursor-blink">█</span>
+        </div>
+      </div>
     </div>
-    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white mb-6 leading-[1.1]">
-      Reddit says <span class="gradient-text">buy</span>.<br class="sm:hidden"> So should you?
+
+    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white mb-4 leading-[1.05] glitch">
+      Reddit says <span class="text-neon-green glow">BUY</span>.<br>
+      <span class="text-gray-500">So should you? Probably not.</span>
     </h1>
-    <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-      A <strong class="text-white">for-fun experiment</strong> that scrapes r/wallstreetbets, r/stocks, and 5 more subreddits.
-      Extracts stock tickers. Pulls real-time market data.
-      Then <strong class="text-white">Deepseek AI</strong> generates a purely hypothetical pick.
-      <span class="text-red-400 font-semibold">Not financial advice. Never invest based on AI output.</span>
+
+    <p class="text-base sm:text-lg text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">
+      A <span class="text-neon-yellow font-semibold">for-fun experiment</span> that scrapes Reddit, pulls live market data, and asks an AI to pick the best stock for the next 7 days.
+      <br><br>
+      <span class="text-neon-red/70 font-mono text-sm">This is not financial advice. This is a language model hallucinating about stocks.</span>
     </p>
-    <a href="/app" class="inline-block bg-brand-500 hover:bg-brand-600 text-white font-bold px-12 py-5 rounded-2xl text-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-brand-500/25">
-      Open Analyzer
+
+    <a href="/app" class="inline-block bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 font-mono font-bold px-10 py-4 rounded-lg text-lg transition-all hover:scale-105 active:scale-95">
+      Run the experiment →
     </a>
   </div>
 
   <!-- Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16 animate-fade-up delay-300">
-    <div class="glass rounded-xl p-5">
-      <div class="text-3xl font-black text-white">7</div>
-      <div class="text-sm text-gray-400 mt-1">Subreddits scraped</div>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-16 animate-fade-up delay-300">
+    <div class="terminal p-4 text-center">
+      <div class="text-2xl font-black text-neon-green">7</div>
+      <div class="text-xs text-gray-600 mt-1 font-mono">subreddits</div>
     </div>
-    <div class="glass rounded-xl p-5">
-      <div class="text-3xl font-black text-white">350+</div>
-      <div class="text-sm text-gray-400 mt-1">Posts per full scan</div>
+    <div class="terminal p-4 text-center">
+      <div class="text-2xl font-black text-neon-cyan">175</div>
+      <div class="text-xs text-gray-600 mt-1 font-mono">posts scanned</div>
     </div>
-    <div class="glass rounded-xl p-5">
-      <div class="text-3xl font-black text-white">500+</div>
-      <div class="text-sm text-gray-400 mt-1">Tickers tracked</div>
+    <div class="terminal p-4 text-center">
+      <div class="text-2xl font-black text-neon-yellow">500+</div>
+      <div class="text-xs text-gray-600 mt-1 font-mono">tickers found</div>
+    </div>
+    <div class="terminal p-4 text-center">
+      <div class="text-2xl font-black text-neon-pink">0</div>
+      <div class="text-xs text-gray-600 mt-1 font-mono">financial advice</div>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="relative z-10 max-w-6xl mx-auto px-6 py-20">
-  <h2 class="text-3xl sm:text-4xl font-black text-white text-center mb-4">How it works</h2>
-  <p class="text-gray-400 text-center mb-14 max-w-xl mx-auto">Four steps from raw Reddit chatter to an AI-powered stock pick.</p>
+<section class="relative z-10 max-w-5xl mx-auto px-6 py-16">
+  <h2 class="text-2xl font-bold text-white text-center mb-3 font-mono"><span class="text-neon-green">$</span> how_it_works()</h2>
+  <p class="text-gray-600 text-center mb-10 text-sm">Four steps from Reddit shitposting to AI hallucination.</p>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <div class="glass rounded-2xl p-6 text-center animate-fade-up">
-      <div class="text-4xl mb-4">🔍</div>
-      <h3 class="font-bold text-white text-lg mb-2">1. Scrape</h3>
-      <p class="text-sm text-gray-400">Pulls hot posts from 7 stock subreddits via Reddit's JSON API. No login required.</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="terminal p-5 animate-fade-up">
+      <div class="text-neon-green font-mono text-xs mb-2">01 // SCRAPE</div>
+      <div class="text-2xl mb-3">🔍</div>
+      <p class="text-sm text-gray-500">Pulls hot posts from r/wallstreetbets, r/stocks, r/investing, r/pennystocks, r/StockMarket, r/thetagang, r/dividends.</p>
     </div>
-    <div class="glass rounded-2xl p-6 text-center animate-fade-up delay-100">
-      <div class="text-4xl mb-4">🏷️</div>
-      <h3 class="font-bold text-white text-lg mb-2">2. Extract</h3>
-      <p class="text-sm text-gray-400">Finds every <code class="text-brand-400">$TICKER</code> and all-caps stock mention in titles and bodies.</p>
+    <div class="terminal p-5 animate-fade-up delay-100">
+      <div class="text-neon-cyan font-mono text-xs mb-2">02 // EXTRACT</div>
+      <div class="text-2xl mb-3">🏷️</div>
+      <p class="text-sm text-gray-500">Finds every <code class="text-neon-green">$TICKER</code> mention. Filters out 80+ false positives (DD, YOLO, ETF, CEO...).</p>
     </div>
-    <div class="glass rounded-2xl p-6 text-center animate-fade-up delay-200">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="font-bold text-white text-lg mb-2">3. Enrich</h3>
-      <p class="text-sm text-gray-400">Fetches live price, P/E, beta, volume, short float, and analyst targets from Yahoo Finance.</p>
+    <div class="terminal p-5 animate-fade-up delay-200">
+      <div class="text-neon-yellow font-mono text-xs mb-2">03 // ENRICH</div>
+      <div class="text-2xl mb-3">📊</div>
+      <p class="text-sm text-gray-500">Fetches price, P/E, beta, volume, short float, and analyst targets from Yahoo Finance.</p>
     </div>
-    <div class="glass rounded-2xl p-6 text-center animate-fade-up delay-300">
-      <div class="text-4xl mb-4">🧠</div>
-      <h3 class="font-bold text-white text-lg mb-2">4. Analyze</h3>
-      <p class="text-sm text-gray-400">Deepseek AI acts as a quant analyst, weighing sentiment, valuation, and momentum.</p>
+    <div class="terminal p-5 animate-fade-up delay-300">
+      <div class="text-neon-pink font-mono text-xs mb-2">04 // HALLUCINATE</div>
+      <div class="text-2xl mb-3">🧠</div>
+      <p class="text-sm text-gray-500">Deepseek AI acts as a quant analyst. It reads the data. It makes a pick. It might be wrong.</p>
     </div>
   </div>
 </section>
 
 <!-- SUBREDDITS -->
-<section class="relative z-10 max-w-6xl mx-auto px-6 pb-20">
-  <h2 class="text-2xl font-black text-white text-center mb-8">Subreddits we monitor</h2>
-  <div class="flex flex-wrap justify-center gap-3">
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-orange-400">r/wallstreetbets</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-blue-400">r/stocks</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-purple-400">r/investing</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-green-400">r/pennystocks</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-yellow-400">r/StockMarket</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-cyan-400">r/thetagang</span>
-    <span class="glass-card px-4 py-2 rounded-full text-sm font-medium text-pink-400">r/dividends</span>
+<section class="relative z-10 max-w-5xl mx-auto px-6 pb-16">
+  <h2 class="text-xl font-bold text-white text-center mb-6 font-mono"><span class="text-neon-green">$</span> sources</h2>
+  <div class="flex flex-wrap justify-center gap-2">
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-orange-400">r/wallstreetbets</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-blue-400">r/stocks</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-purple-400">r/investing</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-green-400">r/pennystocks</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-yellow-400">r/StockMarket</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-cyan-400">r/thetagang</span>
+    <span class="terminal px-3 py-1.5 text-xs font-mono text-pink-400">r/dividends</span>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="relative z-10 max-w-3xl mx-auto px-6 pb-24 text-center">
-  <div class="glass rounded-3xl p-10 sm:p-14 animate-fade-up">
-    <h2 class="text-2xl sm:text-3xl font-black text-white mb-4">Ready to see what Reddit's thinking?</h2>
-    <p class="text-gray-400 mb-6 max-w-md mx-auto">Run a scan now. It takes about 30 seconds to scrape, crunch the numbers, and deliver an <strong>AI-generated prediction</strong>.</p>
-    <a href="/app" class="inline-block bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-brand-500/20 mb-6">
-      Launch Analyzer
+<section class="relative z-10 max-w-2xl mx-auto px-6 pb-20 text-center">
+  <div class="terminal p-8 sm:p-10 animate-fade-up">
+    <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 font-mono">Ready to see what the AI says?</h2>
+    <p class="text-gray-500 mb-6 text-sm max-w-sm mx-auto">Takes about 2 minutes. The AI will pick a stock. It will give you a confidence score. You should ignore it.</p>
+    <a href="/app" class="inline-block bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 font-mono font-bold px-8 py-3 rounded-lg transition-all hover:scale-105 active:scale-95">
+      Launch Analyzer →
     </a>
-    <p class="text-xs text-red-400/70 max-w-sm mx-auto leading-relaxed">
-      Results are AI-generated entertainment. This is not investment advice, a recommendation, or a solicitation to trade. You could lose all your money following random internet predictions.
-    </p>
+    <p class="text-[10px] text-neon-red/50 mt-4 font-mono">For entertainment only. Not financial advice. Past performance ≠ future results. You could lose everything.</p>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="relative z-10 border-t border-white/5 py-8">
-  <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-    <div class="flex items-center gap-1.5">
-      <span>Built with</span>
-      <span class="text-red-400">&#9829;</span>
-      <span>+ Python + Deepseek · For entertainment only</span>
-    </div>
-    <div class="flex items-center gap-6">
-      <a href="https://github.com/AltusRossouw/reddit-stonks" class="hover:text-gray-400 transition-colors">GitHub</a>
-      <a href="https://clawhub.ai/skills/reddit-stonks" class="hover:text-gray-400 transition-colors">ClawHub</a>
+<footer class="relative z-10 border-t border-gray-800/30 py-6">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-700 font-mono">
+    <span>reddit-stonks · AI experiment · not financial advice</span>
+    <div class="flex items-center gap-4">
+      <a href="https://github.com/AltusRossouw/reddit-stonks" class="hover:text-neon-cyan transition-colors">GitHub</a>
+      <a href="https://clawhub.ai/skills/reddit-stonks" class="hover:text-neon-green transition-colors">ClawHub</a>
     </div>
   </div>
 </footer>

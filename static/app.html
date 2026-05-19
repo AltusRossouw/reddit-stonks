@@ -54,6 +54,7 @@ tailwind.config = {
     </a>
     <nav class="flex items-center gap-4 text-sm">
       <a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a>
+      <a href="/track-record" class="text-gray-400 hover:text-white transition-colors">Track Record</a>
       <a href="https://github.com/AltusRossouw/reddit-stonks" class="text-gray-400 hover:text-brand-400 transition-colors flex items-center gap-1.5">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
         GitHub
@@ -73,19 +74,13 @@ tailwind.config = {
 <section class="relative z-10 max-w-6xl mx-auto px-6 pt-12 pb-6">
   <div class="animate-fade-up">
     <h1 class="text-4xl sm:text-5xl font-black text-white text-center mb-2">Stock Analyzer</h1>
-    <p class="text-gray-400 text-center mb-2">Scrapes Reddit, pulls live market data, and gets an <strong>AI-generated prediction</strong>. ~30 seconds.</p>
-    <p class="text-xs text-red-400/70 text-center mb-8">For entertainment only. Not financial advice. Do not invest based on these results.</p>
+    <p class="text-gray-400 text-center mb-2">Scrapes 25 posts from each of 7 subreddits, pulls live market data, and gets an <strong>AI-generated prediction</strong>.</p>
+    <p class="text-xs text-gray-500 text-center mb-8">May take up to 2 minutes to complete the scan.</p>
+    <p class="text-xs text-red-400/70 text-center -mt-7 mb-8">For entertainment only. Not financial advice. Do not invest based on these results.</p>
   </div>
 
   <div class="glass rounded-2xl p-6 lg:p-8 animate-fade-up delay-100">
-    <div class="flex flex-wrap items-end gap-6">
-      <div class="flex-1 min-w-[200px]">
-        <label class="block text-sm font-medium text-gray-400 mb-2">Posts per subreddit</label>
-        <input id="posts" type="range" min="5" max="100" value="25" class="w-full accent-brand-500 h-2 rounded-lg cursor-pointer">
-        <div class="flex justify-between text-xs text-gray-500 mt-1">
-          <span>5 (fast)</span><span>25</span><span>100 (deep)</span>
-        </div>
-      </div>
+    <div class="flex flex-wrap items-end justify-center gap-6">
       <div class="flex items-center gap-3 pb-1">
         <label class="relative inline-flex items-center cursor-pointer">
           <input id="euro" type="checkbox" class="sr-only peer">
@@ -95,7 +90,7 @@ tailwind.config = {
       </div>
       <button id="analyze-btn" onclick="runAnalysis()"
         class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-3.5 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-brand-500/20 whitespace-nowrap">
-        Analyze
+        Scan 175 Posts
       </button>
     </div>
     <p class="text-[10px] text-red-400/50 mt-3 text-center">AI-generated predictions. For fun only. Not financial advice.</p>
@@ -201,7 +196,7 @@ function recBadge(rec) {
 
 async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
-  const posts = document.getElementById('posts').value;
+  const posts = 25;
   const euro = document.getElementById('euro').checked;
 
   btn.disabled = true;
@@ -285,11 +280,6 @@ async function runAnalysis() {
     btn.textContent = 'Analyze';
   }
 }
-
-document.getElementById('posts').addEventListener('input', function() {
-  const labels = this.parentElement.querySelectorAll('span');
-  if (labels.length >= 3) labels[1].textContent = this.value;
-});
 </script>
 
 </body>

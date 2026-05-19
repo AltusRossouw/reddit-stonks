@@ -14,6 +14,7 @@ from rich.table import Table
 
 from reddit_scraper import scrape_all
 from stock_data import fetch_stock_data, find_european_equivalents
+from backtest import save_pick
 
 load_dotenv()
 
@@ -278,6 +279,26 @@ def main():
 
     if args.euro:
         print_euro_equivalents(analysis)
+
+    picks = extract_top_picks(analysis)
+    top_ticker = picks[0] if len(picks) > 0 else ""
+    runner_ticker = picks[1] if len(picks) > 1 else ""
+    wildcard_ticker = picks[2] if len(picks) > 2 else ""
+    conf_match = re.search(r"Confidence Score:\s*(\d+)/10", analysis, re.IGNORECASE)
+    confidence = int(conf_match.group(1)) if conf_match else 0
+
+    save_pick(
+        top_pick=top_ticker,
+        top_price=stock_data.get(top_ticker, {}).get("price", 0),
+        runner_up=runner_ticker,
+        runner_up_price=stock_data.get(runner_ticker, {}).get("price", 0),
+        wildcard=wildcard_ticker,
+        wildcard_price=stock_data.get(wildcard_ticker, {}).get("price", 0),
+        confidence=confidence,
+        posts_scraped=len(reddit_data["posts"]),
+        tickers_found=len(reddit_data["ticker_counts"]),
+        analysis=analysis,
+    )
 
     disclaimer = (
         "DISCLAIMER: This is AI-generated analysis for entertainment/educational "

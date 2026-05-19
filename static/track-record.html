@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Record — Reddit Stonks</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        neon: { green: '#39ff14', pink: '#ff2d95', cyan: '#00f0ff', yellow: '#ffe600', red: '#ff3333' },
+        bg: { dark: '#0a0a0a', card: '#111111' }
+      },
+      fontFamily: { mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'], sans: ['Inter', 'system-ui', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  @keyframes glow { 0%, 100% { text-shadow: 0 0 8px #39ff14, 0 0 24px #39ff1444; } 50% { text-shadow: 0 0 16px #39ff14, 0 0 48px #39ff1466; } }
+  @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .glow { animation: glow 2s ease-in-out infinite; }
+  .scanline { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: #39ff1410; z-index: 9999; pointer-events: none; animation: scanline 8s linear infinite; }
+  .cursor-blink { animation: blink 1s step-end infinite; }
+  .animate-fade-up { animation: fadeUp 0.7s ease-out both; }
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .float { animation: float 3s ease-in-out infinite; }
+  .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #39ff14; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; display: inline-block; }
+  .terminal { background: #0d0d0d; border: 1px solid #333; border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+  .terminal-bar { background: #1a1a1a; border-bottom: 1px solid #333; padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f57; }
+  .terminal-dot.yellow { background: #febc2e; }
+  .terminal-dot.green { background: #28c840; }
+  .noise { position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+</style>
+</head>
+<body class="bg-[#0a0a0a] text-gray-300 min-h-screen font-sans">
+
+<div class="scanline"></div>
+<div class="noise"></div>
+
+<!-- Nav -->
+<header class="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-gray-800/50 px-6 py-3">
+  <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-xl font-mono font-bold text-neon-green glow">$STONKS</span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm font-mono">
+      <a href="/" class="text-gray-500 hover:text-neon-green transition-colors">Home</a>
+      <a href="/app" class="text-gray-500 hover:text-neon-green transition-colors">Analyzer</a>
+      <a href="/track-record" class="text-neon-green">Track Record</a>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="relative z-10 max-w-5xl mx-auto px-6 py-12 space-y-8">
+
+  <!-- Summary Cards -->
+  <section class="animate-fade-up">
+    <h1 class="text-3xl font-bold text-white text-center mb-2 font-mono"><span class="text-neon-green">$</span> track_record</h1>
+    <p class="text-gray-600 text-center mb-8 text-sm">How does the AI actually perform? Probably badly. Let's find out.</p>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8" id="summary-cards">
+      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">AI TOP PICK</div><div class="text-2xl font-black text-neon-yellow"><span id="s-winrate">--</span>%</div><div class="text-[10px] text-gray-600 mt-1">win rate</div></div>
+      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">AI AVG RETURN</div><div class="text-2xl font-black" id="s-avgreturn">--%</div><div class="text-[10px] text-gray-600 mt-1">per pick</div></div>
+      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">INVERSE WSB</div><div class="text-2xl font-black" id="s-inversereturn">--%</div><div class="text-[10px] text-gray-600 mt-1">fade the pick</div></div>
+      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">TOTAL PICKS</div><div class="text-2xl font-black text-neon-cyan" id="s-total">0</div><div class="text-[10px] text-gray-600 mt-1">tracked</div></div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Runner-Up Avg</div><div class="text-lg font-bold" id="s-runneravg">--%</div></div>
+      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Wildcard Avg</div><div class="text-lg font-bold" id="s-wildcardavg">--%</div></div>
+      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Inverse WSB Win Rate</div><div class="text-lg font-bold" id="s-inversewinrate">--%</div></div>
+    </div>
+  </section>
+
+  <!-- Picks Table -->
+  <section id="table-section" class="hidden animate-fade-up delay-100">
+    <h2 class="text-xl font-bold text-white mb-4 font-mono">past_picks[]</h2>
+    <div class="terminal overflow-x-auto">
+      <table class="w-full text-xs font-mono">
+        <thead class="border-b border-gray-800 text-gray-500">
+          <tr>
+            <th class="p-2 text-left">Date</th>
+            <th class="p-2 text-left">Top Pick</th>
+            <th class="p-2 text-right">Entry</th>
+            <th class="p-2 text-right">Now</th>
+            <th class="p-2 text-right">P/L</th>
+            <th class="p-2 text-left hidden sm:table-cell">Runner-Up</th>
+            <th class="p-2 text-right hidden sm:table-cell">R/U P/L</th>
+            <th class="p-2 text-left hidden md:table-cell">Wildcard</th>
+            <th class="p-2 text-right hidden md:table-cell">WC P/L</th>
+            <th class="p-2 text-right">Inverse</th>
+          </tr>
+        </thead>
+        <tbody id="picks-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Empty State -->
+  <section id="empty-state" class="hidden text-center py-12">
+    <div class="terminal inline-block p-8">
+      <div class="text-neon-green font-mono text-sm mb-2">$ ls picks.json</div>
+      <div class="text-gray-600 font-mono text-sm">ls: picks.json: No such file or directory</div>
+      <div class="text-gray-500 font-mono text-xs mt-4">No picks tracked yet. Run the analyzer to start collecting data.</div>
+      <a href="/app" class="inline-block mt-4 text-neon-green hover:underline font-mono text-sm">→ Run Analyzer</a>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <div class="text-center text-[10px] text-neon-red/50 font-mono">
+    Past performance does not guarantee future results. This is an experiment, not a trading strategy.
+  </div>
+</main>
+
+<script>
+function chgClass(v) {
+  if (v === null || v === undefined) return 'text-gray-600';
+  return v >= 0 ? 'text-neon-green' : 'text-neon-red';
+}
+
+function fmtPct(v) {
+  if (v === null || v === undefined) return '--';
+  const sign = v >= 0 ? '+' : '';
+  return sign + v.toFixed(2) + '%';
+}
+
+function fmtPrice(v) {
+  if (v === null || v === undefined) return '--';
+  return '$' + v.toFixed(2);
+}
+
+async function loadTrackRecord() {
+  try {
+    const res = await fetch('/api/track-record');
+    const data = await res.json();
+
+    if (!data.picks || data.picks.length === 0) {
+      document.getElementById('empty-state').classList.remove('hidden');
+      return;
+    }
+
+    document.getElementById('table-section').classList.remove('hidden');
+    const s = data.summary;
+
+    document.getElementById('s-winrate').textContent = s.win_rate;
+    document.getElementById('s-avgreturn').textContent = fmtPct(s.avg_return);
+    document.getElementById('s-avgreturn').className = 'text-2xl font-black ' + chgClass(s.avg_return);
+    document.getElementById('s-inversereturn').textContent = fmtPct(s.avg_inverse_wsb_return);
+    document.getElementById('s-inversereturn').className = 'text-2xl font-black ' + chgClass(s.avg_inverse_wsb_return);
+    document.getElementById('s-total').textContent = s.total_picks;
+    document.getElementById('s-runneravg').textContent = fmtPct(s.avg_runner_up_return);
+    document.getElementById('s-runneravg').className = 'text-lg font-bold ' + chgClass(s.avg_runner_up_return);
+    document.getElementById('s-wildcardavg').textContent = fmtPct(s.avg_wildcard_return);
+    document.getElementById('s-wildcardavg').className = 'text-lg font-bold ' + chgClass(s.avg_wildcard_return);
+    document.getElementById('s-inversewinrate').textContent = s.inverse_wsb_win_rate + '%';
+
+    document.getElementById('picks-body').innerHTML = data.picks.map(p => `
+      <tr class="border-b border-gray-800/30 hover:bg-white/[0.02]">
+        <td class="p-2 text-gray-500">${p.date}<br><span class="text-[10px] text-gray-700">${p.days_ago}d ago</span></td>
+        <td class="p-2 text-neon-cyan font-bold">$${p.top_pick}</td>
+        <td class="p-2 text-right text-gray-400">${fmtPrice(p.entry_price)}</td>
+        <td class="p-2 text-right text-gray-400">${fmtPrice(p.current_price)}</td>
+        <td class="p-2 text-right font-bold ${chgClass(p.pct_change)}">${fmtPct(p.pct_change)}</td>
+        <td class="p-2 hidden sm:table-cell text-gray-400">$${p.runner_up}</td>
+        <td class="p-2 text-right hidden sm:table-cell font-bold ${chgClass(p.runner_up_pnl)}">${fmtPct(p.runner_up_pnl)}</td>
+        <td class="p-2 hidden md:table-cell text-gray-400">$${p.wildcard}</td>
+        <td class="p-2 text-right hidden md:table-cell font-bold ${chgClass(p.wildcard_pnl)}">${fmtPct(p.wildcard_pnl)}</td>
+        <td class="p-2 text-right font-bold ${chgClass(p.inverse_wsb_return)}">${fmtPct(p.inverse_wsb_return)}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('empty-state').classList.remove('hidden');
+  }
+}
+
+loadTrackRecord();
+</script>
+
+</body>
+</html>

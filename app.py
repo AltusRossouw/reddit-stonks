@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from reddit_scraper import scrape_all
 from stock_data import fetch_stock_data, find_european_equivalents
+from backtest import save_pick, compute_performance
 
 load_dotenv()
 
@@ -35,6 +36,16 @@ def extract_top_picks(analysis: str) -> list[str]:
         if ticker:
             picks.append(ticker)
     return picks
+
+
+def parse_confidence(analysis: str) -> int:
+    m = re.search(r"Confidence Score:\s*(\d+)/10", analysis, re.IGNORECASE)
+    return int(m.group(1)) if m else 0
+
+
+def parse_top_ticker_price(ticker: str, stock_data: dict) -> float:
+    sd = stock_data.get(ticker, {})
+    return sd.get("price", 0)
 
 
 def build_context(reddit_data: dict, stock_data: dict, euro: bool = False) -> str:
@@ -187,6 +198,24 @@ async def event_stream(posts_per_sub: int, euro: bool):
     context = build_context(reddit_data, stock_data, euro=euro)
     analysis = await run_analysis(context)
 
+    picks = extract_top_picks(analysis)
+    top_ticker = picks[0] if len(picks) > 0 else ""
+    runner_ticker = picks[1] if len(picks) > 1 else ""
+    wildcard_ticker = picks[2] if len(picks) > 2 else ""
+
+    save_pick(
+        top_pick=top_ticker,
+        top_price=parse_top_ticker_price(top_ticker, stock_data),
+        runner_up=runner_ticker,
+        runner_up_price=parse_top_ticker_price(runner_ticker, stock_data),
+        wildcard=wildcard_ticker,
+        wildcard_price=parse_top_ticker_price(wildcard_ticker, stock_data),
+        confidence=parse_confidence(analysis),
+        posts_scraped=len(reddit_data["posts"]),
+        tickers_found=len(reddit_data["ticker_counts"]),
+        analysis=analysis,
+    )
+
     euro_data = []
     if euro:
         picks = extract_top_picks(analysis)
@@ -200,7 +229,7 @@ async def event_stream(posts_per_sub: int, euro: bool):
 
 @app.get("/api/analyze")
 async def analyze(
-    posts: int = Query(25, ge=5, le=100),
+    posts: int = Query(25, ge=10, le=25),
     euro: bool = Query(False),
 ):
     return StreamingResponse(
@@ -221,6 +250,17 @@ async def index():
 @app.get("/app")
 async def app_page():
     return HTMLResponse(open("static/app.html").read())
+
+
+@app.get("/track-record")
+async def track_record_page():
+    return HTMLResponse(open("static/track-record.html").read())
+
+
+@app.get("/api/track-record")
+async def track_record_api():
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, compute_performance)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
