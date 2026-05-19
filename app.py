@@ -84,6 +84,7 @@ def build_context(reddit_data: dict, stock_data: dict, euro: bool = False) -> st
             f"Recommendation={sd['recommendation']}, "
             f"AnalystTarget={target_str}, "
             f"ShortFloat={short_str}, "
+            f"InstOwnership={sd.get('inst_ownership', 'N/A')}, "
             f"VolRatio={sd['volume_ratio']}, "
             f"RedditMentions={mentions}, "
             f"MentionsTrend={trend} (rising=accelerating hype, falling=fading interest, new=first appearance, steady=same level)"
@@ -209,8 +210,9 @@ async def event_stream(posts_per_sub: int, euro: bool):
                 "forward_pe": sd.get("forward_pe"),
                 "beta": sd.get("beta"),
                 "volume_ratio": sd["volume_ratio"],
-                "short_pct": sd.get("short_pct"),
-                "recommendation": sd["recommendation"],
+            "short_pct": sd.get("short_pct"),
+            "inst_ownership": sd.get("inst_ownership"),
+            "recommendation": sd["recommendation"],
                 "target_mean": sd.get("target_mean"),
                 "mentions": reddit_data["ticker_counts"].get(ticker, 0),
                 "trend": reddit_data.get("trends", {}).get(ticker, "steady"),

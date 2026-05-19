@@ -112,6 +112,8 @@ def _fetch_one(ticker: str) -> tuple:
             "recommendation": info.get("recommendationKey", "N/A"),
             "target_mean": info.get("targetMeanPrice"),
             "short_pct": info.get("shortPercentOfFloat"),
+            "inst_ownership": info.get("heldPercentInstitutions"),
+            "insider_ownership": info.get("heldPercentInsiders"),
         }
     except Exception:
         return ticker, None

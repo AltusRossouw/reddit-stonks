@@ -72,16 +72,57 @@ tailwind.config = {
     <p class="text-gray-600 text-center mb-8 text-sm">How does the AI actually perform? Probably badly. Let's find out.</p>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8" id="summary-cards">
-      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">AI TOP PICK</div><div class="text-2xl font-black text-neon-yellow"><span id="s-winrate">--</span>%</div><div class="text-[10px] text-gray-600 mt-1">win rate</div></div>
-      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">AI AVG RETURN</div><div class="text-2xl font-black" id="s-avgreturn">--%</div><div class="text-[10px] text-gray-600 mt-1">per pick</div></div>
-      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">INVERSE WSB</div><div class="text-2xl font-black" id="s-inversereturn">--%</div><div class="text-[10px] text-gray-600 mt-1">fade the pick</div></div>
-      <div class="terminal p-4 text-center"><div class="text-xs text-gray-600 mb-1">TOTAL PICKS</div><div class="text-2xl font-black text-neon-cyan" id="s-total">0</div><div class="text-[10px] text-gray-600 mt-1">tracked</div></div>
+      <div class="terminal p-3 sm:p-4 text-center"><div class="text-[10px] sm:text-xs text-gray-600 mb-1">AI WIN RATE</div><div class="text-xl sm:text-2xl font-black text-neon-yellow"><span id="s-winrate">--</span>%</div><div class="text-[9px] sm:text-[10px] text-gray-600 mt-1">all time</div></div>
+      <div class="terminal p-3 sm:p-4 text-center"><div class="text-[10px] sm:text-xs text-gray-600 mb-1">AI AVG RETURN</div><div class="text-xl sm:text-2xl font-black" id="s-avgreturn">--%</div><div class="text-[9px] sm:text-[10px] text-gray-600 mt-1">per pick</div></div>
+      <div class="terminal p-3 sm:p-4 text-center"><div class="text-[10px] sm:text-xs text-gray-600 mb-1">S&amp;P 500</div><div class="text-xl sm:text-2xl font-black text-neon-cyan" id="s-spyreturn">--%</div><div class="text-[9px] sm:text-[10px] text-gray-600 mt-1">avg over period</div></div>
+      <div class="terminal p-3 sm:p-4 text-center"><div class="text-[10px] sm:text-xs text-gray-600 mb-1">INVERSE WSB</div><div class="text-xl sm:text-2xl font-black" id="s-inversereturn">--%</div><div class="text-[9px] sm:text-[10px] text-gray-600 mt-1">fade the pick</div></div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Runner-Up Avg</div><div class="text-lg font-bold" id="s-runneravg">--%</div></div>
-      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Wildcard Avg</div><div class="text-lg font-bold" id="s-wildcardavg">--%</div></div>
-      <div class="terminal p-3 text-center"><div class="text-xs text-gray-600">Inverse WSB Win Rate</div><div class="text-lg font-bold" id="s-inversewinrate">--%</div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <div class="terminal p-3 text-center"><div class="text-[10px] text-gray-600">Rolling 30d Win Rate</div><div class="text-lg font-bold text-neon-pink" id="s-rolling-wr">--%</div></div>
+      <div class="terminal p-3 text-center"><div class="text-[10px] text-gray-600">Rolling 30d Avg</div><div class="text-lg font-bold" id="s-rolling-avg">--%</div></div>
+      <div class="terminal p-3 text-center"><div class="text-[10px] text-gray-600">Matured 7d Avg</div><div class="text-lg font-bold" id="s-matured-avg">--%</div></div>
+      <div class="terminal p-3 text-center"><div class="text-[10px] text-gray-600">Total Picks</div><div class="text-lg font-bold text-neon-cyan" id="s-total">0</div></div>
+    </div>
+  </section>
+
+  <!-- Comparison Mode -->
+  <section id="comparison-section" class="hidden animate-fade-up delay-100">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-yellow">$</span> comparison_mode --ai_vs_spy_vs_inverse</h2>
+    <div class="terminal overflow-x-auto mb-8">
+      <table class="w-full text-xs font-mono">
+        <thead class="border-b border-gray-800 text-gray-500">
+          <tr>
+            <th class="p-2 text-left">Date</th>
+            <th class="p-2 text-left">Top Pick</th>
+            <th class="p-2 text-right">AI P/L</th>
+            <th class="p-2 text-right">S&amp;P 500</th>
+            <th class="p-2 text-right">AI vs SPY</th>
+            <th class="p-2 text-right">Inverse</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Matured Picks (7+ days) -->
+  <section id="matured-section" class="hidden animate-fade-up delay-200">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-green">$</span> matured_picks --7day_check</h2>
+    <div class="terminal overflow-x-auto mb-8">
+      <table class="w-full text-xs font-mono">
+        <thead class="border-b border-gray-800 text-gray-500">
+          <tr>
+            <th class="p-2 text-left">Date</th>
+            <th class="p-2 text-left">Pick</th>
+            <th class="p-2 text-right">7d Return</th>
+            <th class="p-2 text-right">S&amp;P 500</th>
+            <th class="p-2 text-right">Inverse 7d</th>
+            <th class="p-2 text-right">Days Ago</th>
+          </tr>
+        </thead>
+        <tbody id="matured-body"></tbody>
+      </table>
     </div>
   </section>
 
@@ -157,15 +198,47 @@ async function loadTrackRecord() {
 
     document.getElementById('s-winrate').textContent = s.win_rate;
     document.getElementById('s-avgreturn').textContent = fmtPct(s.avg_return);
-    document.getElementById('s-avgreturn').className = 'text-2xl font-black ' + chgClass(s.avg_return);
+    document.getElementById('s-avgreturn').className = 'text-xl sm:text-2xl font-black ' + chgClass(s.avg_return);
     document.getElementById('s-inversereturn').textContent = fmtPct(s.avg_inverse_wsb_return);
-    document.getElementById('s-inversereturn').className = 'text-2xl font-black ' + chgClass(s.avg_inverse_wsb_return);
+    document.getElementById('s-inversereturn').className = 'text-xl sm:text-2xl font-black ' + chgClass(s.avg_inverse_wsb_return);
+    document.getElementById('s-spyreturn').textContent = fmtPct(s.matured_spy_avg);
+    document.getElementById('s-spyreturn').className = 'text-xl sm:text-2xl font-black text-neon-cyan';
     document.getElementById('s-total').textContent = s.total_picks;
-    document.getElementById('s-runneravg').textContent = fmtPct(s.avg_runner_up_return);
-    document.getElementById('s-runneravg').className = 'text-lg font-bold ' + chgClass(s.avg_runner_up_return);
-    document.getElementById('s-wildcardavg').textContent = fmtPct(s.avg_wildcard_return);
-    document.getElementById('s-wildcardavg').className = 'text-lg font-bold ' + chgClass(s.avg_wildcard_return);
-    document.getElementById('s-inversewinrate').textContent = s.inverse_wsb_win_rate + '%';
+    document.getElementById('s-rolling-wr').textContent = s.rolling_30d_win_rate + '%';
+    document.getElementById('s-rolling-avg').textContent = fmtPct(s.rolling_30d_avg_return);
+    document.getElementById('s-rolling-avg').className = 'text-lg font-bold ' + chgClass(s.rolling_30d_avg_return);
+    document.getElementById('s-matured-avg').textContent = fmtPct(s.matured_7day_avg);
+    document.getElementById('s-matured-avg').className = 'text-lg font-bold ' + chgClass(s.matured_7day_avg);
+
+    // Comparison table
+    if (data.picks && data.picks.length > 0) {
+      document.getElementById('comparison-section').classList.remove('hidden');
+      document.getElementById('comparison-body').innerHTML = data.picks.map(p => `
+        <tr class="border-b border-gray-800/30 hover:bg-white/[0.02]">
+          <td class="p-2 text-gray-500">${p.date}</td>
+          <td class="p-2 text-neon-cyan font-bold">$${p.top_pick}</td>
+          <td class="p-2 text-right font-bold ${chgClass(p.pct_change)}">${fmtPct(p.pct_change)}</td>
+          <td class="p-2 text-right font-bold ${chgClass(p.spy_pnl)}">${fmtPct(p.spy_pnl)}</td>
+          <td class="p-2 text-right font-bold ${chgClass(p.ai_vs_spy)}">${fmtPct(p.ai_vs_spy)}</td>
+          <td class="p-2 text-right font-bold ${chgClass(p.inverse_wsb_return)}">${fmtPct(p.inverse_wsb_return)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Matured picks
+    if (data.matured_picks && data.matured_picks.length > 0) {
+      document.getElementById('matured-section').classList.remove('hidden');
+      document.getElementById('matured-body').innerHTML = data.matured_picks.map(m => `
+        <tr class="border-b border-gray-800/30 hover:bg-white/[0.02]">
+          <td class="p-2 text-gray-500">${m.date}</td>
+          <td class="p-2 text-neon-cyan font-bold">$${m.top_pick}</td>
+          <td class="p-2 text-right font-bold ${chgClass(m.pick_7day_return)}">${fmtPct(m.pick_7day_return)}</td>
+          <td class="p-2 text-right font-bold ${chgClass(m.spy_7day_return)}">${fmtPct(m.spy_7day_return)}</td>
+          <td class="p-2 text-right font-bold ${chgClass(m.inverse_7day_return)}">${fmtPct(m.inverse_7day_return)}</td>
+          <td class="p-2 text-right text-gray-600">${m.days_ago}d</td>
+        </tr>
+      `).join('');
+    }
 
     document.getElementById('picks-body').innerHTML = data.picks.map(p => `
       <tr class="border-b border-gray-800/30 hover:bg-white/[0.02]">
