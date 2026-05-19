@@ -82,19 +82,19 @@ tailwind.config = {
 
   <!-- CONTROLS -->
   <section class="animate-fade-up delay-100">
-    <div class="terminal p-6">
+    <div class="terminal p-4 sm:p-6">
       <div class="terminal-bar mb-4">
         <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
-        <span class="text-xs text-gray-600 ml-2">init.sh</span>
+        <span class="text-[10px] sm:text-xs text-gray-600 ml-2">init.sh</span>
       </div>
-      <div class="flex flex-wrap items-center justify-center gap-6">
-        <label class="flex items-center gap-3 cursor-pointer">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-6">
+        <label class="flex items-center gap-2 sm:gap-3 cursor-pointer justify-center sm:justify-start">
           <input id="euro" type="checkbox" class="sr-only peer">
-          <div class="w-11 h-6 bg-gray-800 border border-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-neon-green after:rounded-full after:h-5 after:w-5 after:transition-all relative"></div>
-          <span class="text-xs text-gray-500 font-mono">--euro</span>
+          <div class="w-10 h-5 sm:w-11 sm:h-6 bg-gray-800 border border-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-neon-green after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all relative"></div>
+          <span class="text-[10px] sm:text-xs text-gray-500 font-mono">--euro</span>
         </label>
         <button id="analyze-btn" onclick="runAnalysis()"
-          class="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 font-mono font-bold px-8 py-3 rounded-lg text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100">
+          class="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 font-mono font-bold px-6 sm:px-8 py-3 rounded-lg text-xs sm:text-sm transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed w-full sm:w-auto">
           ./scan --posts 25
         </button>
       </div>
@@ -103,10 +103,10 @@ tailwind.config = {
 
   <!-- STATUS -->
   <section id="status" class="hidden animate-fade-up">
-    <div class="terminal p-6 text-center pulse-border">
-      <div class="flex items-center justify-center gap-3 mb-3">
+    <div class="terminal p-4 sm:p-6 text-center pulse-border">
+      <div class="flex items-center justify-center gap-2 sm:gap-3 mb-3">
         <div class="spinner"></div>
-        <span id="status-text" class="text-neon-green font-mono text-sm">$ scraping reddit...</span>
+        <span id="status-text" class="text-neon-green font-mono text-xs sm:text-sm">$ scraping reddit...</span>
       </div>
       <div class="bg-gray-800 rounded-full h-1 max-w-xs mx-auto overflow-hidden">
         <div class="h-full bg-neon-green/70 w-3/4 rounded-full animate-pulse"></div>
@@ -143,7 +143,34 @@ tailwind.config = {
 
   <div id="analysis-section" class="hidden animate-fade-up delay-100">
     <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-yellow">$</span> deepseek --analyze</h2>
-    <div id="analysis-content" class="terminal p-5"></div>
+    <div id="analysis-content" class="terminal p-4 sm:p-5 text-xs sm:text-sm"></div>
+  </div>
+
+  <div id="track-record-inline" class="hidden animate-fade-up delay-200">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-pink">$</span> cat /var/log/stonks/track_record</h2>
+    <div class="terminal p-4 sm:p-5">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <div>
+          <div class="text-xs text-gray-600 font-mono mb-1">AI Win Rate</div>
+          <div id="tr-winrate" class="text-xl font-bold text-neon-yellow font-mono">--</div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-600 font-mono mb-1">AI Avg Return</div>
+          <div id="tr-avgreturn" class="text-xl font-bold font-mono">--</div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-600 font-mono mb-1">Inverse WSB</div>
+          <div id="tr-inverse" class="text-xl font-bold font-mono">--</div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-600 font-mono mb-1">Total Picks</div>
+          <div id="tr-total" class="text-xl font-bold text-neon-cyan font-mono">--</div>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <a href="/track-record" class="text-[10px] sm:text-xs text-neon-green hover:underline font-mono">→ View full track record</a>
+      </div>
+    </div>
   </div>
 
   <div id="euro-section" class="hidden animate-fade-up delay-200">
@@ -211,6 +238,25 @@ function trendIcon(trend) {
   return `<span class="${colors[trend] || 'text-gray-600'} font-bold">${map[trend] || '→'}</span>`;
 }
 
+function chgClass(v) { if (v === null || v === undefined) return 'text-gray-500'; return v >= 0 ? 'text-neon-green' : 'text-neon-red'; }
+
+async function loadTrackRecordInline() {
+  try {
+    const res = await fetch('/api/track-record');
+    const data = await res.json();
+    if (!data.summary || data.summary.total_picks === 0) return;
+    const s = data.summary;
+    document.getElementById('tr-winrate').textContent = s.win_rate + '%';
+    document.getElementById('tr-winrate').className = 'text-xl font-bold font-mono ' + chgClass(s.win_rate - 50);
+    document.getElementById('tr-avgreturn').textContent = (s.avg_return >= 0 ? '+' : '') + s.avg_return + '%';
+    document.getElementById('tr-avgreturn').className = 'text-xl font-bold font-mono ' + chgClass(s.avg_return);
+    document.getElementById('tr-inverse').textContent = (s.avg_inverse_wsb_return >= 0 ? '+' : '') + s.avg_inverse_wsb_return + '%';
+    document.getElementById('tr-inverse').className = 'text-xl font-bold font-mono ' + chgClass(s.avg_inverse_wsb_return);
+    document.getElementById('tr-total').textContent = s.total_picks;
+    document.getElementById('track-record-inline').classList.remove('hidden');
+  } catch(e) {}
+}
+
 async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
   const euro = document.getElementById('euro').checked;
@@ -224,6 +270,7 @@ async function runAnalysis() {
     es.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.type === 'status') document.getElementById('status-text').textContent = '$ ' + data.message.toLowerCase();
+      if (data.type === 'error') { document.getElementById('status-text').textContent = '$ error: ' + data.message; document.getElementById('status-text').className = 'text-neon-red font-mono text-xs sm:text-sm'; }
       if (data.type === 'result') {
         if (data.stocks) {
           document.getElementById('stock-body').innerHTML = data.stocks.map(s => `
@@ -270,6 +317,7 @@ async function runAnalysis() {
         document.getElementById('disclaimer').classList.remove('hidden');
         btn.disabled = false;
         btn.textContent = './scan --posts 25';
+        loadTrackRecordInline();
       }
     };
     es.onerror = () => { es.close(); document.getElementById('status').classList.add('hidden'); btn.disabled = false; btn.textContent = './scan --posts 25'; };

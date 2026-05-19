@@ -1,9 +1,14 @@
 import re
 import time
+import json
+import os
 from collections import Counter
 from datetime import datetime, timedelta
 
 import requests
+
+CACHE_FILE = "trend_cache.json"
+CACHE_TTL_HOURS = 6
 
 SUBREDDITS = [
     "wallstreetbets",
@@ -171,7 +176,28 @@ def scrape_prior_week(subreddit: str, limit: int = 50) -> list[dict]:
     return posts
 
 
+def _load_trend_cache() -> tuple[dict, float]:
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE) as f:
+                data = json.load(f)
+            return data.get("counts", {}), data.get("ts", 0)
+        except (json.JSONDecodeError, KeyError):
+            pass
+    return {}, 0
+
+
+def _save_trend_cache(counter: Counter):
+    with open(CACHE_FILE, "w") as f:
+        json.dump({"counts": dict(counter), "ts": time.time()}, f)
+
+
 def scrape_prior_period(limit_per_sub: int = 50) -> Counter:
+    cached_counts, cached_ts = _load_trend_cache()
+    if cached_counts and (time.time() - cached_ts) < CACHE_TTL_HOURS * 3600:
+        print(f"\n  Using cached trend data ({len(cached_counts)} tickers)")
+        return Counter(cached_counts)
+
     counter: Counter = Counter()
     for sub in SUBREDDITS:
         print(f"  r/{sub} (prior week)...", end=" ", flush=True)
@@ -182,6 +208,8 @@ def scrape_prior_period(limit_per_sub: int = 50) -> Counter:
             for t in set(extract_tickers(full_text)):
                 counter[t] += 1
         time.sleep(1.5)
+
+    _save_trend_cache(counter)
     return counter
 
 

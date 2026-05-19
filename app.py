@@ -173,74 +173,83 @@ DATA:
         return f"Error calling Deepseek API: {e}"
 
 
+async def send_event(msg_type: str, data: dict):
+    yield f"data: {json.dumps({'type': msg_type, **data})}\n\n"
+
+
 async def event_stream(posts_per_sub: int, euro: bool):
-    yield f"data: {json.dumps({'type': 'status', 'message': 'Scraping Reddit...'})}\n\n"
+    try:
+        yield f"data: {json.dumps({'type': 'status', 'message': 'Scraping Reddit...'})}\n\n"
 
-    loop = asyncio.get_event_loop()
-    reddit_data = await loop.run_in_executor(None, lambda: scrape_all(limit_per_sub=posts_per_sub))
+        loop = asyncio.get_event_loop()
+        reddit_data = await loop.run_in_executor(None, lambda: scrape_all(limit_per_sub=posts_per_sub))
 
-    ticker_count = len(reddit_data["ticker_counts"])
-    yield f"data: {json.dumps({'type': 'status', 'message': f'Found {ticker_count} unique tickers. Fetching stock data...'})}\n\n"
+        ticker_count = len(reddit_data["ticker_counts"])
+        yield f"data: {json.dumps({'type': 'status', 'message': f'Found {ticker_count} unique tickers. Fetching stock data...'})}\n\n"
 
-    top_tickers = list(reddit_data["ticker_counts"].keys())[:TOP_N_TICKERS]
-    stock_data = await loop.run_in_executor(None, fetch_stock_data, top_tickers)
+        top_tickers = list(reddit_data["ticker_counts"].keys())[:TOP_N_TICKERS]
+        stock_data = await loop.run_in_executor(None, fetch_stock_data, top_tickers)
 
-    yield f"data: {json.dumps({'type': 'status', 'message': f'Stock data ready for {len(stock_data)} tickers. Sending to AI...'})}\n\n"
+        yield f"data: {json.dumps({'type': 'status', 'message': f'Stock data ready for {len(stock_data)} tickers. Sending to AI...'})}\n\n"
 
-    stock_rows = []
-    for ticker in list(reddit_data["ticker_counts"].keys())[:TOP_N_TICKERS]:
-        sd = stock_data.get(ticker)
-        if not sd:
-            continue
-        stock_rows.append({
-            "ticker": ticker,
-            "price": sd["price"],
-            "currency": sd["currency"],
-            "market_cap": sd["market_cap"],
-            "sector": sd["sector"],
-            "short_name": sd["short_name"],
-            "week_change_pct": sd["week_change_pct"],
-            "pe_ratio": sd.get("pe_ratio"),
-            "forward_pe": sd.get("forward_pe"),
-            "beta": sd.get("beta"),
-            "volume_ratio": sd["volume_ratio"],
-            "short_pct": sd.get("short_pct"),
-            "recommendation": sd["recommendation"],
-            "target_mean": sd.get("target_mean"),
-            "mentions": reddit_data["ticker_counts"].get(ticker, 0),
-            "trend": reddit_data.get("trends", {}).get(ticker, "steady"),
-        })
+        stock_rows = []
+        for ticker in list(reddit_data["ticker_counts"].keys())[:TOP_N_TICKERS]:
+            sd = stock_data.get(ticker)
+            if not sd:
+                continue
+            stock_rows.append({
+                "ticker": ticker,
+                "price": sd["price"],
+                "currency": sd["currency"],
+                "market_cap": sd["market_cap"],
+                "sector": sd["sector"],
+                "short_name": sd["short_name"],
+                "week_change_pct": sd["week_change_pct"],
+                "pe_ratio": sd.get("pe_ratio"),
+                "forward_pe": sd.get("forward_pe"),
+                "beta": sd.get("beta"),
+                "volume_ratio": sd["volume_ratio"],
+                "short_pct": sd.get("short_pct"),
+                "recommendation": sd["recommendation"],
+                "target_mean": sd.get("target_mean"),
+                "mentions": reddit_data["ticker_counts"].get(ticker, 0),
+                "trend": reddit_data.get("trends", {}).get(ticker, "steady"),
+            })
 
-    context = build_context(reddit_data, stock_data, euro=euro)
-    analysis = await run_analysis(context)
+        context = build_context(reddit_data, stock_data, euro=euro)
+        analysis = await run_analysis(context)
 
-    picks = extract_top_picks(analysis)
-    top_ticker = picks[0] if len(picks) > 0 else ""
-    runner_ticker = picks[1] if len(picks) > 1 else ""
-    wildcard_ticker = picks[2] if len(picks) > 2 else ""
-
-    save_pick(
-        top_pick=top_ticker,
-        top_price=parse_top_ticker_price(top_ticker, stock_data),
-        runner_up=runner_ticker,
-        runner_up_price=parse_top_ticker_price(runner_ticker, stock_data),
-        wildcard=wildcard_ticker,
-        wildcard_price=parse_top_ticker_price(wildcard_ticker, stock_data),
-        confidence=parse_confidence(analysis),
-        posts_scraped=len(reddit_data["posts"]),
-        tickers_found=len(reddit_data["ticker_counts"]),
-        analysis=analysis,
-    )
-
-    euro_data = []
-    if euro:
         picks = extract_top_picks(analysis)
-        for us_ticker in picks:
-            eq = await loop.run_in_executor(None, find_european_equivalents, us_ticker)
-            euro_data.append({"us_ticker": us_ticker, "equivalents": eq})
+        top_ticker = picks[0] if len(picks) > 0 else ""
+        runner_ticker = picks[1] if len(picks) > 1 else ""
+        wildcard_ticker = picks[2] if len(picks) > 2 else ""
 
-    yield f"data: {json.dumps({'type': 'result', 'stocks': stock_rows, 'analysis': analysis, 'euro': euro_data})}\n\n"
-    yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        save_pick(
+            top_pick=top_ticker,
+            top_price=parse_top_ticker_price(top_ticker, stock_data),
+            runner_up=runner_ticker,
+            runner_up_price=parse_top_ticker_price(runner_ticker, stock_data),
+            wildcard=wildcard_ticker,
+            wildcard_price=parse_top_ticker_price(wildcard_ticker, stock_data),
+            confidence=parse_confidence(analysis),
+            posts_scraped=len(reddit_data["posts"]),
+            tickers_found=len(reddit_data["ticker_counts"]),
+            analysis=analysis,
+        )
+
+        euro_data = []
+        if euro:
+            picks = extract_top_picks(analysis)
+            for us_ticker in picks:
+                eq = await loop.run_in_executor(None, find_european_equivalents, us_ticker)
+                euro_data.append({"us_ticker": us_ticker, "equivalents": eq})
+
+        yield f"data: {json.dumps({'type': 'result', 'stocks': stock_rows, 'analysis': analysis, 'euro': euro_data})}\n\n"
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+    except Exception as e:
+        yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
 
 @app.get("/api/analyze")
