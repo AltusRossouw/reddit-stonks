@@ -12,119 +12,127 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        brand: { 50: '#eefbf2', 100: '#d6f5dd', 200: '#b0eabf', 300: '#7cd997', 400: '#4ac06e', 500: '#26a54b', 600: '#18863a', 700: '#146a30', 800: '#135429', 900: '#114523', 950: '#052610' }
+        neon: { green: '#39ff14', pink: '#ff2d95', cyan: '#00f0ff', yellow: '#ffe600', red: '#ff3333' }
       },
-      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+      fontFamily: { mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'], sans: ['Inter', 'system-ui', 'sans-serif'] }
     }
   }
 }
 </script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-.glass { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-.glass-card { background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
-.gradient-text { background: linear-gradient(135deg, #4ac06e 0%, #7cd997 50%, #4ac06e 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 4s ease infinite; }
-@keyframes gradientShift { 0%, 100% { background-position: 0% center; } 50% { background-position: 100% center; } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-@keyframes spin { to { transform: rotate(360deg); } }
-.animate-fade-up { animation: fadeUp 0.7s ease-out both; }
-.delay-100 { animation-delay: 0.1s; }
-.float { animation: float 4s ease-in-out infinite; }
-.spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #4ac06e; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; display: inline-block; }
-.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; }
-.grid-bg { background-image: radial-gradient(rgba(74, 192, 110, 0.06) 1px, transparent 1px); background-size: 40px 40px; }
+  @keyframes glow { 0%, 100% { text-shadow: 0 0 8px #39ff14, 0 0 24px #39ff1444; } 50% { text-shadow: 0 0 16px #39ff14, 0 0 48px #39ff1466; } }
+  @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse-border { 0%, 100% { border-color: #39ff1422; } 50% { border-color: #39ff1488; } }
+  .glow { animation: glow 2s ease-in-out infinite; }
+  .scanline { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: #39ff1410; z-index: 9999; pointer-events: none; animation: scanline 8s linear infinite; }
+  .cursor-blink { animation: blink 1s step-end infinite; }
+  .animate-fade-up { animation: fadeUp 0.7s ease-out both; }
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #39ff14; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; display: inline-block; }
+  .terminal { background: #0d0d0d; border: 1px solid #333; border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+  .terminal-bar { background: #1a1a1a; border-bottom: 1px solid #333; padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f57; }
+  .terminal-dot.yellow { background: #febc2e; }
+  .terminal-dot.green { background: #28c840; }
+  .noise { position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+  .pulse-border { animation: pulse-border 2s ease-in-out infinite; }
 </style>
 </head>
-<body class="bg-[#070b12] text-gray-200 min-h-screen">
+<body class="bg-[#0a0a0a] text-gray-300 min-h-screen font-sans">
 
-<!-- Background -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-  <div class="orb w-[500px] h-[500px] bg-brand-500 -top-20 -right-20" style="opacity:0.12"></div>
-  <div class="orb w-[300px] h-[300px] bg-brand-300 bottom-0 -left-10" style="opacity:0.06"></div>
-  <div class="grid-bg absolute inset-0"></div>
-</div>
+<div class="scanline"></div>
+<div class="noise"></div>
 
 <!-- Nav -->
-<header class="glass sticky top-0 z-50 px-6 py-3.5">
-  <div class="max-w-6xl mx-auto flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 group">
-      <span class="text-2xl float" style="animation-duration:5s">📈</span>
-      <span class="text-xl font-extrabold gradient-text">Reddit Stonks</span>
+<header class="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur border-b border-gray-800/50 px-6 py-3">
+  <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-xl font-mono font-bold text-neon-green glow">$STONKS</span>
     </a>
-    <nav class="flex items-center gap-4 text-sm">
-      <a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a>
-      <a href="/track-record" class="text-gray-400 hover:text-white transition-colors">Track Record</a>
-      <a href="https://github.com/AltusRossouw/reddit-stonks" class="text-gray-400 hover:text-brand-400 transition-colors flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        GitHub
-      </a>
+    <nav class="flex items-center gap-5 text-sm font-mono">
+      <a href="/" class="text-gray-500 hover:text-neon-green transition-colors">Home</a>
+      <a href="/app" class="text-neon-green">Analyzer</a>
+      <a href="/track-record" class="text-gray-500 hover:text-neon-green transition-colors">Track Record</a>
+      <a href="https://github.com/AltusRossouw/reddit-stonks" class="text-gray-500 hover:text-neon-cyan transition-colors">GitHub</a>
     </nav>
   </div>
 </header>
 
 <!-- Disclaimer Banner -->
-<div class="relative z-10 bg-red-500/10 border-b border-red-500/20">
-  <div class="max-w-6xl mx-auto px-6 py-2.5 text-center text-xs text-red-400/80 font-medium">
-    NOT FINANCIAL ADVICE — AI-generated entertainment only. Investing carries risk. These are hypothetical predictions from a language model.
+<div class="bg-neon-red/10 border-b border-neon-red/20">
+  <div class="max-w-5xl mx-auto px-6 py-2 text-center text-xs text-neon-red/80 font-mono font-bold">
+    NOT FINANCIAL ADVICE — AI-generated entertainment only. Hypothetical predictions from a language model.
   </div>
 </div>
 
-<!-- ANALYZER CONTROLS -->
-<section class="relative z-10 max-w-6xl mx-auto px-6 pt-12 pb-6">
-  <div class="animate-fade-up">
-    <h1 class="text-4xl sm:text-5xl font-black text-white text-center mb-2">Stock Analyzer</h1>
-    <p class="text-gray-400 text-center mb-2">Scrapes 25 posts from each of 7 subreddits, pulls live market data, and gets an <strong>AI-generated prediction</strong>.</p>
-    <p class="text-xs text-gray-500 text-center mb-8">May take up to 2 minutes to complete the scan.</p>
-    <p class="text-xs text-red-400/70 text-center -mt-7 mb-8">For entertainment only. Not financial advice. Do not invest based on these results.</p>
-  </div>
+<main class="relative z-10 max-w-5xl mx-auto px-6 py-10 space-y-8">
 
-  <div class="glass rounded-2xl p-6 lg:p-8 animate-fade-up delay-100">
-    <div class="flex flex-wrap items-end justify-center gap-6">
-      <div class="flex items-center gap-3 pb-1">
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input id="euro" type="checkbox" class="sr-only peer">
-          <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-brand-500 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
-        </label>
-        <span class="text-sm text-gray-400">European tickers</span>
+  <!-- HEADER -->
+  <section class="animate-fade-up text-center">
+    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-3 font-mono"><span class="text-neon-green">$</span> ./stonks_analyzer</h1>
+    <p class="text-gray-500 text-sm mb-1 font-mono">Scrapes 175 posts from 7 subreddits → pulls market data → asks AI</p>
+    <p class="text-gray-700 text-xs font-mono">May take up to 2 minutes. Results are probably wrong.</p>
+  </section>
+
+  <!-- CONTROLS -->
+  <section class="animate-fade-up delay-100">
+    <div class="terminal p-6">
+      <div class="terminal-bar mb-4">
+        <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+        <span class="text-xs text-gray-600 ml-2">init.sh</span>
       </div>
-      <button id="analyze-btn" onclick="runAnalysis()"
-        class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-10 py-3.5 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-brand-500/20 whitespace-nowrap">
-        Scan 175 Posts
-      </button>
+      <div class="flex flex-wrap items-center justify-center gap-6">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input id="euro" type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-800 border border-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-neon-green after:rounded-full after:h-5 after:w-5 after:transition-all relative"></div>
+          <span class="text-xs text-gray-500 font-mono">--euro</span>
+        </label>
+        <button id="analyze-btn" onclick="runAnalysis()"
+          class="bg-neon-green/10 hover:bg-neon-green/20 text-neon-green border border-neon-green/30 font-mono font-bold px-8 py-3 rounded-lg text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100">
+          ./scan --posts 25
+        </button>
+      </div>
     </div>
-    <p class="text-[10px] text-red-400/50 mt-3 text-center">AI-generated predictions. For fun only. Not financial advice.</p>
-  </div>
+  </section>
 
-  <!-- Status -->
-  <div id="status" class="hidden glass rounded-2xl p-6 text-center mt-6 animate-fade-up">
-    <div class="flex items-center justify-center gap-3">
-      <div class="spinner"></div>
-      <span id="status-text" class="text-brand-400 font-medium text-lg">Scraping Reddit...</span>
+  <!-- STATUS -->
+  <section id="status" class="hidden animate-fade-up">
+    <div class="terminal p-6 text-center pulse-border">
+      <div class="flex items-center justify-center gap-3 mb-3">
+        <div class="spinner"></div>
+        <span id="status-text" class="text-neon-green font-mono text-sm">$ scraping reddit...</span>
+      </div>
+      <div class="bg-gray-800 rounded-full h-1 max-w-xs mx-auto overflow-hidden">
+        <div class="h-full bg-neon-green/70 w-3/4 rounded-full animate-pulse"></div>
+      </div>
     </div>
-    <div class="mt-4 h-1 bg-gray-800 rounded-full overflow-hidden max-w-md mx-auto">
-      <div class="h-full bg-gradient-to-r from-brand-500 to-brand-300 rounded-full animate-pulse" style="width: 60%"></div>
-    </div>
-  </div>
-</section>
+  </section>
+
+</main>
 
 <!-- RESULTS -->
-<section class="relative z-10 max-w-6xl mx-auto px-6 pb-8 space-y-8">
+<section class="relative z-10 max-w-5xl mx-auto px-6 pb-8 space-y-8">
 
-  <div id="stock-section" class="hidden">
-    <h2 class="text-xl font-bold text-white mb-4">Stock Data Snapshot</h2>
-    <div class="glass rounded-2xl overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="border-b border-gray-800">
-          <tr class="text-gray-400 text-left">
-            <th class="p-3 pl-4">Ticker</th>
-            <th class="p-3 text-right">Price</th>
-            <th class="p-3 text-right">1Wk Chg</th>
-            <th class="p-3 text-right hidden sm:table-cell">Mkt Cap</th>
-            <th class="p-3 text-right hidden md:table-cell">P/E</th>
-            <th class="p-3 text-right hidden md:table-cell">Beta</th>
-            <th class="p-3 text-right">Mentions</th>
-            <th class="p-3 text-center hidden sm:table-cell">Rec</th>
+  <div id="stock-section" class="hidden animate-fade-up">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-cyan">$</span> cat market_data.json</h2>
+    <div class="terminal overflow-x-auto">
+      <table class="w-full text-xs font-mono">
+        <thead class="border-b border-gray-800 text-gray-500">
+          <tr>
+            <th class="p-2 text-left">Ticker</th>
+            <th class="p-2 text-right">Price</th>
+            <th class="p-2 text-right">1Wk Chg</th>
+            <th class="p-2 text-right hidden sm:table-cell">Mkt Cap</th>
+            <th class="p-2 text-right hidden md:table-cell">P/E</th>
+            <th class="p-2 text-right hidden md:table-cell">Beta</th>
+            <th class="p-2 text-right">Mentions</th>
+            <th class="p-2 text-center hidden sm:table-cell">Rec</th>
           </tr>
         </thead>
         <tbody id="stock-body"></tbody>
@@ -132,22 +140,22 @@ tailwind.config = {
     </div>
   </div>
 
-  <div id="analysis-section" class="hidden">
-    <h2 class="text-xl font-bold text-white mb-4">AI Analysis — Best Stock for Next 7 Days</h2>
-    <div id="analysis-content" class="glass rounded-2xl p-6 lg:p-8"></div>
+  <div id="analysis-section" class="hidden animate-fade-up delay-100">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-yellow">$</span> deepseek --analyze</h2>
+    <div id="analysis-content" class="terminal p-5"></div>
   </div>
 
-  <div id="euro-section" class="hidden">
-    <h2 class="text-xl font-bold text-white mb-4">European Equivalents</h2>
-    <div class="glass rounded-2xl overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="border-b border-gray-800">
-          <tr class="text-gray-400 text-left">
-            <th class="p-3 pl-4">US Ticker</th>
-            <th class="p-3">Euro Ticker</th>
-            <th class="p-3">Exchange</th>
-            <th class="p-3 text-right">Price</th>
-            <th class="p-3">Currency</th>
+  <div id="euro-section" class="hidden animate-fade-up delay-200">
+    <h2 class="text-lg font-bold text-white mb-3 font-mono"><span class="text-neon-pink">$</span> grep -r ".DE\|.VI\|.SW" exchanges/</h2>
+    <div class="terminal overflow-x-auto">
+      <table class="w-full text-xs font-mono">
+        <thead class="border-b border-gray-800 text-gray-500">
+          <tr>
+            <th class="p-2 text-left">US</th>
+            <th class="p-2 text-left">Euro</th>
+            <th class="p-2 text-left">Exchange</th>
+            <th class="p-2 text-right">Price</th>
+            <th class="p-2">Cur</th>
           </tr>
         </thead>
         <tbody id="euro-body"></tbody>
@@ -155,102 +163,92 @@ tailwind.config = {
     </div>
   </div>
 
-  <div id="disclaimer" class="hidden glass rounded-2xl p-5 border border-red-500/20 bg-red-500/5 text-center">
-    <p class="text-sm text-red-400/90 font-semibold mb-1">NOT FINANCIAL ADVICE</p>
-    <p class="text-xs text-red-400/60">This is an AI-powered experiment for entertainment purposes only. The analysis above was generated by a language model and should not be used to make investment decisions. You could lose all your money. Always consult a licensed financial advisor.</p>
+  <div id="disclaimer" class="hidden text-center animate-fade-up">
+    <div class="terminal p-4 border-neon-red/30 bg-neon-red/5">
+      <p class="text-neon-red font-mono text-xs">*** NOT FINANCIAL ADVICE ***</p>
+      <p class="text-gray-600 font-mono text-[10px] mt-1">AI hallucination for entertainment only. Do not invest. You will lose money.</p>
+    </div>
   </div>
 
 </section>
 
 <script>
-function formatMCap(cap) { if (!cap) return 'N/A'; return '$' + (cap / 1e9).toFixed(1) + 'B'; }
-function formatChange(pct) { const cls = pct >= 0 ? 'text-green-400' : 'text-red-400'; const sign = pct >= 0 ? '+' : ''; return `<span class="${cls} font-semibold">${sign}${pct.toFixed(2)}%</span>`; }
+function formatMCap(cap) { if (!cap) return '--'; return '$' + (cap / 1e9).toFixed(1) + 'B'; }
+function formatChange(pct) { const cls = pct >= 0 ? 'text-neon-green' : 'text-neon-red'; const sign = pct >= 0 ? '+' : ''; return `<span class="${cls}">${sign}${pct.toFixed(2)}%</span>`; }
 function formatPrice(p) { return '$' + p.toFixed(2); }
 
 function renderAnalysis(text) {
   return text
-    .replace(/\*\*(TOP PICK[^*]*)\*\*/g, '<div class="mt-6 mb-2 text-xl font-black text-green-400">$1</div>')
-    .replace(/\*\*(RUNNER-UP[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-blue-400">$1</div>')
-    .replace(/\*\*(WILDCARD[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-orange-400">$1</div>')
-    .replace(/\*\*(Risk[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-red-400">$1</div>')
-    .replace(/\*\*(Confidence[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-yellow-400">$1</div>')
-    .replace(/\*\*(European[^*]*)\*\*/g, '<div class="mt-5 mb-2 text-lg font-bold text-purple-400">$1</div>')
-    .replace(/- Rationale:\s*(.*?)(?=<br>|$)/g, '<div class="text-gray-400 ml-4 mt-1 leading-relaxed">$1</div>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-    .replace(/\n- (.*?)(?=\n|$)/g, '<div class="flex items-start gap-2 ml-4 mt-1 text-gray-400"><span class="text-brand-400 mt-1.5">&#8226;</span> <span>$1</span></div>')
+    .replace(/\*\*(TOP PICK[^*]*)\*\*/g, '<div class="mt-5 mb-1 text-neon-green font-bold">>>> $1</div>')
+    .replace(/\*\*(RUNNER-UP[^*]*)\*\*/g, '<div class="mt-4 mb-1 text-neon-cyan font-bold">>>> $1</div>')
+    .replace(/\*\*(WILDCARD[^*]*)\*\*/g, '<div class="mt-4 mb-1 text-neon-pink font-bold">>>> $1</div>')
+    .replace(/\*\*(Risk[^*]*)\*\*/g, '<div class="mt-4 mb-1 text-neon-yellow font-bold">>>> $1</div>')
+    .replace(/\*\*(Confidence[^*]*)\*\*/g, '<div class="mt-4 mb-1 text-neon-red font-bold">>>> $1</div>')
+    .replace(/\*\*(European[^*]*)\*\*/g, '<div class="mt-4 mb-1 text-neon-pink font-bold">>>> $1</div>')
+    .replace(/- Rationale:\s*(.*?)(?=<br>|$)/g, '<div class="text-gray-500 ml-4 mt-1">$1</div>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+    .replace(/\n- (.*?)(?=\n|$)/g, '<div class="ml-4 mt-1 text-gray-500"><span class="text-neon-green">•</span> $1</div>')
     .replace(/\n\n/g, '<br>')
     .replace(/\n/g, '<br>');
 }
 
 function recBadge(rec) {
   const map = {
-    strong_buy: 'bg-green-900/50 text-green-400 border-green-500/20',
-    buy: 'bg-green-900/30 text-green-300 border-green-500/10',
-    hold: 'bg-yellow-900/30 text-yellow-300 border-yellow-500/10',
-    sell: 'bg-red-900/30 text-red-300 border-red-500/10',
-    strong_sell: 'bg-red-900/50 text-red-400 border-red-500/20',
+    strong_buy: 'text-neon-green border-neon-green/30 bg-neon-green/5',
+    buy: 'text-green-400 border-green-400/20 bg-green-400/5',
+    hold: 'text-neon-yellow border-neon-yellow/30 bg-neon-yellow/5',
+    sell: 'text-neon-red border-neon-red/30 bg-neon-red/5',
+    strong_sell: 'text-neon-red border-neon-red/50 bg-neon-red/10',
   };
-  const cls = map[rec] || 'bg-gray-800 text-gray-400 border-gray-600/20';
-  return `<span class="px-2 py-0.5 rounded-full text-xs border ${cls}">${rec.replace(/_/g,' ')}</span>`;
+  const cls = map[rec] || 'text-gray-600 border-gray-700 bg-transparent';
+  return `<span class="px-1.5 py-0.5 rounded text-[10px] border ${cls}">${rec.replace(/_/g,' ')}</span>`;
 }
 
 async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
-  const posts = 25;
   const euro = document.getElementById('euro').checked;
-
   btn.disabled = true;
-  btn.textContent = 'Running...';
-
+  btn.textContent = '[ running... ]';
   ['stock-section','analysis-section','euro-section','disclaimer'].forEach(id => document.getElementById(id).classList.add('hidden'));
   document.getElementById('status').classList.remove('hidden');
 
   try {
-    const es = new EventSource(`/api/analyze?posts=${posts}&euro=${euro}`);
-
+    const es = new EventSource(`/api/analyze?posts=25&euro=${euro}`);
     es.onmessage = (e) => {
       const data = JSON.parse(e.data);
-
-      if (data.type === 'status') {
-        document.getElementById('status-text').textContent = data.message;
-      }
-
+      if (data.type === 'status') document.getElementById('status-text').textContent = '$ ' + data.message.toLowerCase();
       if (data.type === 'result') {
         if (data.stocks) {
           document.getElementById('stock-body').innerHTML = data.stocks.map(s => `
-            <tr class="border-b border-gray-800/30 hover:bg-white/[0.03] transition-colors">
-              <td class="p-3 pl-4 font-bold text-brand-400">$${s.ticker}</td>
-              <td class="p-3 text-right font-mono">${formatPrice(s.price)}</td>
-              <td class="p-3 text-right font-mono">${formatChange(s.week_change_pct)}</td>
-              <td class="p-3 text-right font-mono hidden sm:table-cell text-gray-400">${formatMCap(s.market_cap)}</td>
-              <td class="p-3 text-right font-mono hidden md:table-cell text-gray-400">${s.pe_ratio ? s.pe_ratio.toFixed(1) : '\u2014'}</td>
-              <td class="p-3 text-right font-mono hidden md:table-cell text-gray-400">${s.beta ? s.beta.toFixed(2) : '\u2014'}</td>
-              <td class="p-3 text-right font-mono font-semibold text-white">${s.mentions}</td>
-              <td class="p-3 text-center hidden sm:table-cell">${recBadge(s.recommendation)}</td>
-            </tr>
-          `).join('');
+            <tr class="border-b border-gray-800/20 hover:bg-white/[0.02]">
+              <td class="p-2 text-neon-cyan font-bold">$${s.ticker}</td>
+              <td class="p-2 text-right text-gray-400">${formatPrice(s.price)}</td>
+              <td class="p-2 text-right">${formatChange(s.week_change_pct)}</td>
+              <td class="p-2 text-right hidden sm:table-cell text-gray-600">${formatMCap(s.market_cap)}</td>
+              <td class="p-2 text-right hidden md:table-cell text-gray-600">${s.pe_ratio ? s.pe_ratio.toFixed(1) : '--'}</td>
+              <td class="p-2 text-right hidden md:table-cell text-gray-600">${s.beta ? s.beta.toFixed(2) : '--'}</td>
+              <td class="p-2 text-right text-neon-yellow font-bold">${s.mentions}</td>
+              <td class="p-2 text-center hidden sm:table-cell">${recBadge(s.recommendation)}</td>
+            </tr>`).join('');
           document.getElementById('stock-section').classList.remove('hidden');
         }
-
         if (data.analysis) {
           document.getElementById('analysis-content').innerHTML = renderAnalysis(data.analysis);
           document.getElementById('analysis-section').classList.remove('hidden');
         }
-
         if (data.euro && data.euro.length > 0) {
           let rows = '';
           data.euro.forEach(e => {
             if (e.equivalents.length === 0) {
-              rows += `<tr class="border-b border-gray-800/30"><td class="p-3 pl-4 font-bold text-brand-400">$${e.us_ticker}</td><td class="p-3 text-gray-600">\u2014</td><td class="p-3 text-gray-600">\u2014</td><td class="p-3 text-right text-gray-600">\u2014</td><td class="p-3 text-gray-600">\u2014</td></tr>`;
+              rows += `<tr class="border-b border-gray-800/20"><td class="p-2 text-neon-cyan font-bold">$${e.us_ticker}</td><td class="p-2 text-gray-700">--</td><td class="p-2 text-gray-700">--</td><td class="p-2 text-right text-gray-700">--</td><td class="p-2 text-gray-700">--</td></tr>`;
             } else {
               e.equivalents.forEach(eq => {
-                rows += `<tr class="border-b border-gray-800/30 hover:bg-white/[0.03] transition-colors">
-                  <td class="p-3 pl-4 font-bold text-brand-400">$${e.us_ticker}</td>
-                  <td class="p-3 font-mono text-green-400 font-semibold">${eq.ticker}</td>
-                  <td class="p-3 text-gray-400">${eq.exchange}</td>
-                  <td class="p-3 text-right font-mono">${eq.price.toFixed(2)}</td>
-                  <td class="p-3 text-gray-400">${eq.currency}</td>
-                </tr>`;
+                rows += `<tr class="border-b border-gray-800/20 hover:bg-white/[0.02]">
+                  <td class="p-2 text-neon-cyan font-bold">$${e.us_ticker}</td>
+                  <td class="p-2 text-neon-green">${eq.ticker}</td>
+                  <td class="p-2 text-gray-500">${eq.exchange}</td>
+                  <td class="p-2 text-right text-gray-400">${eq.price.toFixed(2)}</td>
+                  <td class="p-2 text-gray-600">${eq.currency}</td></tr>`;
               });
             }
           });
@@ -258,29 +256,17 @@ async function runAnalysis() {
           document.getElementById('euro-section').classList.remove('hidden');
         }
       }
-
       if (data.type === 'done') {
         es.close();
         document.getElementById('status').classList.add('hidden');
         document.getElementById('disclaimer').classList.remove('hidden');
         btn.disabled = false;
-        btn.textContent = 'Analyze';
+        btn.textContent = './scan --posts 25';
       }
     };
-
-    es.onerror = () => {
-      es.close();
-      document.getElementById('status').classList.add('hidden');
-      btn.disabled = false;
-      btn.textContent = 'Analyze';
-    };
-  } catch (err) {
-    document.getElementById('status').classList.add('hidden');
-    btn.disabled = false;
-    btn.textContent = 'Analyze';
-  }
+    es.onerror = () => { es.close(); document.getElementById('status').classList.add('hidden'); btn.disabled = false; btn.textContent = './scan --posts 25'; };
+  } catch (err) { document.getElementById('status').classList.add('hidden'); btn.disabled = false; btn.textContent = './scan --posts 25'; }
 }
 </script>
-
 </body>
 </html>
